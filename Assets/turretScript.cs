@@ -45,21 +45,24 @@ public class turretScript : MonoBehaviour
                 transform.position + offset,
                 player.transform.position
             );
-            if (hit.collider.gameObject.tag.In("Player", "Bullet"))
+            if (hit)
             {
-                currentCD -= Time.fixedDeltaTime;
-                if (currentCD <= 0)
+                if (hit.collider.gameObject.tag.In("Player", "Bullet"))
                 {
-                    GameObject spawned = Instantiate(
-                        bullet,
-                        transform.position + offset,
-                        Quaternion.Euler(new Vector3(0, 0, Angle()))
-                    );
-                    bulletMovement script = spawned.GetComponent<bulletMovement>();
-                    script.moveSpeed = bulletSpeed;
-                    script.size = 1f;
-                    script.color = Color.red;
-                    currentCD = maxCD;
+                    currentCD -= Time.fixedDeltaTime;
+                    if (currentCD <= 0)
+                    {
+                        GameObject spawned = Instantiate(
+                            bullet,
+                            transform.position + offset,
+                            Quaternion.Euler(new Vector3(0, 0, Angle()))
+                        );
+                        bulletMovement script = spawned.GetComponent<bulletMovement>();
+                        script.moveSpeed = bulletSpeed;
+                        script.size = 1f;
+                        script.color = Color.red;
+                        currentCD = maxCD;
+                    }
                 }
             }
             else

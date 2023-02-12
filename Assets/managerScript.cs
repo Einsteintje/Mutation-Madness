@@ -14,11 +14,16 @@ public class managerScript : MonoBehaviour
 
     private float scale = 0.2f;
     private float noise = 0.5f;
-    private int turretAmount = 6;
-    private int barrelAmount = 8;
-    private int enemyAmount = 4;
+    private int turretAmount = 1;
+    private int barrelAmount = 1;
+    private int enemyAmount = 1;
     private float currentOffset;
     public string state = "Idle";
+
+    public int maxTimer = 5;
+    public float waveTimer;
+    public int currentWave = 0;
+
     private Dictionary<string, int> objectDict = new Dictionary<string, int>
     {
         { "Turret", 0 },
@@ -41,22 +46,21 @@ public class managerScript : MonoBehaviour
         for (int i = 0; i < objectDict.Count; i++)
             objectLists.Add(new List<GameObject>());
         NewMap();
+        waveTimer = maxTimer;
+        state = "Generating";
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        if (Input.GetMouseButtonDown(1))
+        if (state == "Idle")
+            waveTimer -= Time.fixedDeltaTime;
+
+        if (Input.GetMouseButtonDown(1) || waveTimer < 0)
         {
+            waveTimer = maxTimer;
             ClearMap();
             state = "Clearing";
-        }
-        if (state == "Generating")
-        {
-            for (int i = 0; i < objectLists.Count; i++)
-                objectLists[i].Clear();
-            objectSpots.Clear();
-            NewMap();
         }
     }
 
@@ -65,14 +69,15 @@ public class managerScript : MonoBehaviour
         for (int i = 0; i < objectLists.Count; i++)
             objectLists[i].RemoveAll(s => s == null);
 
-        turretAmount = 0 + objectLists[0].Count;
-        barrelAmount = 0 + objectLists[1].Count;
+        turretAmount = 2 + objectLists[0].Count;
+        barrelAmount = 2 + objectLists[1].Count;
+        enemyAmount = 2 + objectLists[1].Count;
         StartCoroutine(DestroyObjects());
     }
 
     IEnumerator DestroyObjects()
     {
-        WaitForSeconds wait = new WaitForSeconds(0.01f);
+        WaitForSeconds wait = new WaitForSeconds(0.005f);
 
         foreach (List<GameObject> objectList in objectLists)
         {
@@ -80,31 +85,23 @@ public class managerScript : MonoBehaviour
             {
                 if (objectList[i] == null)
                     continue;
-
                 objectList[i].SendMessage("Death");
-                //ParticleSystem[] psList = objectList[i].GetComponentsInChildren<ParticleSystem>();
-                //foreach (ParticleSystem ps in psList)
-                //    ps.Play();
-                // objectList[i]..spriteRenderer.enabled = false;
-                //Destroy(objectList[i], 2f);
                 yield return wait;
             }
-
-            //   this.Log(objectList.Count);
         }
         yield return wait;
         state = "Generating";
+        for (int i = 0; i < objectLists.Count; i++)
+            objectLists[i].Clear();
+        objectSpots.Clear();
+        NewMap();
     }
 
     void NewMap()
     {
         currentOffset = Random.Range(100, 10000);
         List<List<float>> list = GenerateMap();
-        LoadMap(list);
-        Objects();
-        Enemies();
-        state = "Idle";
-        //objectLists[2].Shuffle();
+        StartCoroutine(LoadMap(list));
     }
 
     List<List<float>> GenerateMap()
@@ -121,8 +118,11 @@ public class managerScript : MonoBehaviour
         return list;
     }
 
-    void LoadMap(List<List<float>> list)
+    IEnumerator LoadMap(List<List<float>> list)
     {
+        WaitForSeconds wait = new WaitForSeconds(0.005f);
+
+        //boxes
         Vector2Int middle = new Vector2Int(list[0].Count / 2, list.Count / 2);
         for (int y = 0; y < list.Count; y++)
         {
@@ -140,6 +140,7 @@ public class managerScript : MonoBehaviour
                         GameObject spawned = Instantiate(box, pos, box.transform.rotation);
                         objectLists[objectDict[spawned.tag]].Add(spawned);
                         spawned.transform.parent = navMesh.transform;
+                        yield return wait;
                     }
                 }
                 else if (!Neighbours(list, x, y))
@@ -148,10 +149,8 @@ public class managerScript : MonoBehaviour
                     enemySpots.Add(new Vector2Int(x, y));
             }
         }
-    }
 
-    void Enemies()
-    {
+        //enemies
         enemySpots.Shuffle();
         for (int i = 0; i < enemyAmount; i++)
         {
@@ -162,11 +161,9 @@ public class managerScript : MonoBehaviour
             );
             GameObject spawned = Instantiate(enemy, pos, enemy.transform.rotation);
             objectLists[objectDict[spawned.tag]].Add(spawned);
+            yield return wait;
         }
-    }
 
-    void Objects()
-    {
         List<Vector2Int> spots = new List<Vector2Int>();
         List<int> randomNums = GenerateRandom(turretAmount + barrelAmount, 0, objectSpots.Count);
         foreach (int num in randomNums)
@@ -185,6 +182,8 @@ public class managerScript : MonoBehaviour
             }
             spots.Add(objectSpots[test]);
         }
+
+        //objects
         for (int i = 0; i < spots.Count; i++)
         {
             GameObject spawned;
@@ -200,8 +199,14 @@ public class managerScript : MonoBehaviour
             }
             else
                 spawned = Instantiate(barrel, pos, barrel.transform.rotation);
+            spawned.transform.parent = navMesh.transform;
             objectLists[objectDict[spawned.tag]].Add(spawned);
+            yield return wait;
         }
+
+        yield return wait;
+        state = "Idle";
+        currentWave++;
     }
 
     List<int> GenerateRandom(int count, int min, int max)

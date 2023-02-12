@@ -49,7 +49,7 @@ public class bulletMovement : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (!other.gameObject.tag.In("Enemy", "Turret") || color == Color.cyan)
+        if (color == Color.cyan || !other.gameObject.tag.In("Enemy", "Turret"))
         {
             if (other.gameObject.tag != "Bullet" && moveSpeed != 0)
                 other.gameObject.SendMessage("Hit");

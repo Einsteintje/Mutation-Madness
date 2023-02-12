@@ -55,7 +55,7 @@ public class enemyScript : MonoBehaviour
             );
             offset = Vector3.ClampMagnitude(offset, 4.0f);
             hit = Physics2D.Linecast(transform.position + offset, player.transform.position);
-            if (hit != null)
+            if (hit)
             {
                 if (
                     hit.collider.gameObject.tag != "Player"
