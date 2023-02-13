@@ -18,11 +18,13 @@ public class boxScript : MonoBehaviour
         GetComponent<SpriteRenderer>().enabled = false;
         InvokeRepeating("Lights", 0.0f, 0.1f);
         light2d = GetComponentInChildren<UnityEngine.Rendering.Universal.Light2D>();
-        Destroy(gameObject, 1f);
+        light2d.intensity = 5.0f;
+        Destroy(gameObject, 2f);
     }
 
     void Lights()
     {
+        this.Log(light2d.intensity);
         light2d.intensity = Mathf.Lerp(light2d.intensity, 0, 0.2f);
     }
 }
