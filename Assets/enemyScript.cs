@@ -9,6 +9,8 @@ public class enemyScript : MonoBehaviour
     public GameObject enemyBody;
     GameObject body;
     SpriteRenderer spriteRenderer;
+        Color origionalColor;
+    float flashTime = 0.05f;
 
     //pathfinding
     private Transform target;
@@ -26,6 +28,9 @@ public class enemyScript : MonoBehaviour
     public float hp;
     private float stopDistance;
 
+    private Vector3 knockback = new Vector3();
+
+
     void Start()
     {
         player = GameObject.FindWithTag("Player");
@@ -38,12 +43,16 @@ public class enemyScript : MonoBehaviour
 
         body = Instantiate(enemyBody);
         spriteRenderer = body.GetComponent<SpriteRenderer>();
+        origionalColor = spriteRenderer.color;
     }
 
     void FixedUpdate()
     {
         if (manager.state != "Clearing" && hp > 0)
         {
+            knockback = new Vector3(Mathf.Lerp(knockback.x, 0, 0.2f), Mathf.Lerp(knockback.y, 0, 0.2f), 0);
+            transform.position += knockback;
+
             body.transform.position = transform.position;
 
             navMeshAgent.SetDestination(target.position);
@@ -90,14 +99,28 @@ public class enemyScript : MonoBehaviour
         }
     }
 
-    void Hit()
+    void Hit(Vector3 kb)
     {
+        knockback = kb;
         hp--;
+        Flash();
         if (hp <= 0)
         {
             Death();
         }
     }
+
+    void Flash()
+ {  
+        spriteRenderer.color = Color.white;
+     Invoke("ResetColor", flashTime);
+ }
+
+     void ResetColor()
+ {
+   
+        spriteRenderer.color = origionalColor;
+ }
 
     void Death()
     {
