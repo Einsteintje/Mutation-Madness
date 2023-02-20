@@ -23,6 +23,7 @@ public class managerScript : MonoBehaviour
     public int maxTimer = 5;
     public float waveTimer;
     public int currentWave = 0;
+    public int currentPower = 0;
 
     private Dictionary<string, int> objectDict = new Dictionary<string, int>
     {
@@ -31,6 +32,13 @@ public class managerScript : MonoBehaviour
         { "Enemy", 2 },
         { "Box", 3 }
     };
+
+    private Dictionary<string, int> powerDict = new Dictionary<string, int>{
+        {"Turret", 100},
+        {"Enemy", 50}
+    };
+
+    private List<string> enemies = new List<string>{"Turret", "Enemy"};
 
     private List<Vector2Int> objectSpots = new List<Vector2Int>();
     private List<Vector2Int> enemySpots = new List<Vector2Int>();
@@ -64,13 +72,30 @@ public class managerScript : MonoBehaviour
         }
     }
 
+    List<string> GetEnemies(){
+        List<string> spawns = new List<string>();
+        while (currentPower > 0){
+            int randomIndex = Random.Range(0, enemies.Count);
+            string randomKey = enemies[randomIndex];
+            if (currentPower >= powerDict[randomKey]){
+                currentPower -= powerDict[randomKey];
+                spawns.Add(randomKey);
+                }
+            }
+        return spawns;
+    }
+
     void ClearMap()
     {
         for (int i = 0; i < objectLists.Count; i++)
             objectLists[i].RemoveAll(s => s == null);
+        currentWave++;
+        currentPower+= currentWave * 150;
+        List<string> spawns = GetEnemies();
+        this.Log(spawns);
 
         turretAmount = 2 + objectLists[0].Count;
-        barrelAmount = 2 + objectLists[1].Count;
+        barrelAmount = 3;
         enemyAmount = 2 + objectLists[1].Count;
         StartCoroutine(DestroyObjects());
     }
@@ -206,7 +231,6 @@ public class managerScript : MonoBehaviour
 
         yield return wait;
         state = "Idle";
-        currentWave++;
     }
 
     List<int> GenerateRandom(int count, int min, int max)
