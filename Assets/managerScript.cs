@@ -16,7 +16,7 @@ public class managerScript : MonoBehaviour
     private float scale = 0.2f;
     private float noise = 0.5f;
     //private int turretAmount = 1;
-    //private int barrelAmount = 1;
+    private int barrelAmount = 1;
     //private int enemyAmount = 1;
     private float currentOffset;
     public string state = "Idle";
@@ -65,13 +65,15 @@ public class managerScript : MonoBehaviour
         List<string> spawns = GetEnemies();
         this.Log(spawns);
 
-        foreach(string spawn in spawns){
-            amountDict[spawn]++;
+        
+        for(int i = 0;i<spawns.Count;i++){
+            amountDict[spawns[i]]++;
         }
-
-        foreach(string enemy in amountDict.Keys){
+        List<string> keyList = new List<string>(amountDict.Keys);
+        foreach(string enemy in keyList){
             amountDict[enemy] += objectLists[objectDict[enemy]].Count;
         }
+
 
         NewMap();
         waveTimer = maxTimer;
@@ -114,11 +116,11 @@ public class managerScript : MonoBehaviour
         List<string> spawns = GetEnemies();
         this.Log(spawns);
 
-        foreach(string spawn in spawns){
-            amountDict[spawn]++;
+        for(int i = 0;i<spawns.Count;i++){
+            amountDict[spawns[i]]++;
         }
-
-        foreach(string enemy in amountDict.Keys){
+        List<string> keyList = new List<string>(amountDict.Keys);
+        foreach(string enemy in keyList){
             amountDict[enemy] += objectLists[objectDict[enemy]].Count;
         }
 
@@ -218,7 +220,7 @@ public class managerScript : MonoBehaviour
         }
 
         List<Vector2Int> spots = new List<Vector2Int>();
-        List<int> randomNums = GenerateRandom(amountDict["Barrel"] + amountDict["Turret"], 0, objectSpots.Count);
+        List<int> randomNums = GenerateRandom(barrelAmount + amountDict["Turret"], 0, objectSpots.Count);
         foreach (int num in randomNums)
         {
             int crashFix = 0;
