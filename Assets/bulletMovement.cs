@@ -52,7 +52,7 @@ public class bulletMovement : MonoBehaviour
         if (color == Color.cyan || !other.gameObject.tag.In("Enemy", "Turret"))
         {
             if (other.gameObject.tag != "Bullet" && moveSpeed != 0)
-                other.gameObject.SendMessage("Hit");
+                other.gameObject.SendMessage("Hit", transform.up);
             Death();
         }
     }

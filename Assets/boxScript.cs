@@ -16,7 +16,7 @@ public class boxScript : MonoBehaviour
         GetComponent<BoxCollider2D>().enabled = false;
         GetComponent<ParticleSystem>().Play();
         GetComponent<SpriteRenderer>().enabled = false;
-        InvokeRepeating("Lights", 0.0f, 0.1f);
+        InvokeRepeating("Lights", 0.0f, 0.02f);
         light2d = GetComponentInChildren<UnityEngine.Rendering.Universal.Light2D>();
         light2d.intensity = 5.0f;
         Destroy(gameObject, 2f);
@@ -24,7 +24,6 @@ public class boxScript : MonoBehaviour
 
     void Lights()
     {
-        this.Log(light2d.intensity);
-        light2d.intensity = Mathf.Lerp(light2d.intensity, 0, 0.2f);
+        light2d.intensity = Mathf.Lerp(light2d.intensity, 0, 0.1f);
     }
 }
