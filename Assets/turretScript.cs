@@ -97,6 +97,6 @@ public class turretScript : MonoBehaviour
         ps.Play(); //gonna be a different one later
         GetComponent<BoxCollider2D>().enabled = false;
         GetComponent<SpriteRenderer>().enabled = false;
-        Destroy(gameObject, 3f);
+        Destroy(gameObject, 1f);
     }
 }

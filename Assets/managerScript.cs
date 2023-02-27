@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class managerScript : MonoBehaviour
 {
     public GameObject box;
@@ -15,9 +14,9 @@ public class managerScript : MonoBehaviour
 
     private float scale = 0.2f;
     private float noise = 0.5f;
-    //private int turretAmount = 1;
-    private int barrelAmount = 1;
-    //private int enemyAmount = 1;
+
+    private int barrelAmount = 3;
+
     private float currentOffset;
     public string state = "Idle";
 
@@ -25,7 +24,6 @@ public class managerScript : MonoBehaviour
     public float waveTimer;
     public int currentWave = 0;
     public int currentPower = 0;
-
 
     private Dictionary<string, int> objectDict = new Dictionary<string, int>
     {
@@ -35,17 +33,19 @@ public class managerScript : MonoBehaviour
         { "Box", 3 }
     };
 
-    private Dictionary<string, int> powerDict = new Dictionary<string, int>{
-        {"Turret", 100},
-        {"Enemy", 50}
+    private Dictionary<string, int> powerDict = new Dictionary<string, int>
+    {
+        { "Turret", 100 },
+        { "Enemy", 10 }
     };
 
-    private Dictionary<string, int> amountDict = new Dictionary<string, int>{
-        {"Turret", 0},
-        {"Enemy", 0}
+    private Dictionary<string, int> amountDict = new Dictionary<string, int>
+    {
+        { "Turret", 0 },
+        { "Enemy", 0 }
     };
 
-    private List<string> enemies = new List<string>{"Turret", "Enemy"};
+    private List<string> enemies = new List<string> { "Turret", "Enemy" };
 
     private List<Vector2Int> objectSpots = new List<Vector2Int>();
     private List<Vector2Int> enemySpots = new List<Vector2Int>();
@@ -60,20 +60,6 @@ public class managerScript : MonoBehaviour
 
         for (int i = 0; i < objectDict.Count; i++)
             objectLists.Add(new List<GameObject>());
-
-        currentPower+= currentWave * 150 + 150;
-        List<string> spawns = GetEnemies();
-        this.Log(spawns);
-
-        
-        for(int i = 0;i<spawns.Count;i++){
-            amountDict[spawns[i]]++;
-        }
-        List<string> keyList = new List<string>(amountDict.Keys);
-        foreach(string enemy in keyList){
-            amountDict[enemy] += objectLists[objectDict[enemy]].Count;
-        }
-
 
         NewMap();
         waveTimer = maxTimer;
@@ -94,16 +80,44 @@ public class managerScript : MonoBehaviour
         }
     }
 
-    List<string> GetEnemies(){
+    public bool InScreen(Vector3 pos)
+    {
+        if (Mathf.Abs(pos.x) < screenSize.x && Mathf.Abs(pos.y) < screenSize.y)
+            return true;
+        else
+            return false;
+    }
+
+    void AddEnemies()
+    {
+        currentPower += 50; //* currentWave  + 150;
+        List<string> spawns = GetEnemies();
+
+        for (int i = 0; i < spawns.Count; i++)
+        {
+            this.Log(spawns[i]);
+            amountDict[spawns[i]]++;
+        }
+        List<string> keyList = new List<string>(amountDict.Keys);
+        foreach (string enemy in keyList)
+        {
+            amountDict[enemy] += objectLists[objectDict[enemy]].Count;
+        }
+    }
+
+    List<string> GetEnemies()
+    {
         List<string> spawns = new List<string>();
-        while (currentPower > 0){
+        while (currentPower > 0)
+        {
             int randomIndex = Random.Range(0, enemies.Count);
             string randomKey = enemies[randomIndex];
-            if (currentPower >= powerDict[randomKey]){
+            if (currentPower >= powerDict[randomKey])
+            {
                 currentPower -= powerDict[randomKey];
                 spawns.Add(randomKey);
-                }
             }
+        }
         return spawns;
     }
 
@@ -111,22 +125,10 @@ public class managerScript : MonoBehaviour
     {
         for (int i = 0; i < objectLists.Count; i++)
             objectLists[i].RemoveAll(s => s == null);
+
         currentWave++;
-        currentPower+= currentWave * 150 + 150;
-        List<string> spawns = GetEnemies();
-        this.Log(spawns);
 
-        for(int i = 0;i<spawns.Count;i++){
-            amountDict[spawns[i]]++;
-        }
-        List<string> keyList = new List<string>(amountDict.Keys);
-        foreach(string enemy in keyList){
-            amountDict[enemy] += objectLists[objectDict[enemy]].Count;
-        }
-
-        //turretAmount = 2 + objectLists[0].Count;
-        //barrelAmount = 3;
-        //enemyAmount = 2 + objectLists[1].Count;
+        //AddEnemies();
         StartCoroutine(DestroyObjects());
     }
 
@@ -156,6 +158,7 @@ public class managerScript : MonoBehaviour
     {
         currentOffset = Random.Range(100, 10000);
         List<List<float>> list = GenerateMap();
+        AddEnemies();
         StartCoroutine(LoadMap(list));
     }
 
@@ -220,7 +223,11 @@ public class managerScript : MonoBehaviour
         }
 
         List<Vector2Int> spots = new List<Vector2Int>();
-        List<int> randomNums = GenerateRandom(barrelAmount + amountDict["Turret"], 0, objectSpots.Count);
+        List<int> randomNums = GenerateRandom(
+            barrelAmount + amountDict["Turret"],
+            0,
+            objectSpots.Count
+        );
         foreach (int num in randomNums)
         {
             int crashFix = 0;

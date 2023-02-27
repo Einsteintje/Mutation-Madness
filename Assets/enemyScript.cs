@@ -9,12 +9,13 @@ public class enemyScript : MonoBehaviour
     public GameObject enemyBody;
     GameObject body;
     SpriteRenderer spriteRenderer;
-        Color origionalColor;
+    Color origionalColor;
     float flashTime = 0.05f;
 
     //pathfinding
-    private Transform target;
     public UnityEngine.AI.NavMeshAgent navMeshAgent;
+    int pos = -1;
+    Vector3 target = new Vector3(0, 0, 0);
 
     //shooting
     GameObject player;
@@ -26,20 +27,15 @@ public class enemyScript : MonoBehaviour
     public GameObject bullet;
     RaycastHit2D hit;
     public float hp;
-    private float stopDistance;
 
     private Vector3 knockback = new Vector3();
-
 
     void Start()
     {
         player = GameObject.FindWithTag("Player");
         playerScript = player.GetComponent<playerMovement>();
-        target = player.transform;
         managerObject = GameObject.FindWithTag("Manager");
         manager = managerObject.GetComponent<managerScript>();
-        stopDistance = 30;
-        navMeshAgent.SetDestination(target.position);
 
         body = Instantiate(enemyBody);
         spriteRenderer = body.GetComponent<SpriteRenderer>();
@@ -50,12 +46,25 @@ public class enemyScript : MonoBehaviour
     {
         if (manager.state != "Clearing" && hp > 0)
         {
-            knockback = new Vector3(Mathf.Lerp(knockback.x, 0, 0.2f), Mathf.Lerp(knockback.y, 0, 0.2f), 0);
+            if (Vector3.Distance(target, transform.position) < 3 || target.x * target.y == 0.0f)
+            {
+                target = AIManager.instance.GetPos(pos, out pos);
+            }
+            else
+            {
+                navMeshAgent.SetDestination(target);
+            }
+
+            this.Log(target, pos, Vector3.Distance(target, transform.position));
+
+            knockback = new Vector3(
+                Mathf.Lerp(knockback.x, 0, 0.2f),
+                Mathf.Lerp(knockback.y, 0, 0.2f),
+                0
+            );
             transform.position += knockback;
 
             body.transform.position = transform.position;
-
-            navMeshAgent.SetDestination(target.position);
 
             Vector3 offset = new Vector3(
                 player.transform.position.x - transform.position.x,
@@ -66,15 +75,7 @@ public class enemyScript : MonoBehaviour
             hit = Physics2D.Linecast(transform.position + offset, player.transform.position);
             if (hit)
             {
-                if (
-                    hit.collider.gameObject.tag != "Player"
-                    && hit.collider.gameObject.tag != "Bullet"
-                )
-                    navMeshAgent.stoppingDistance = 5;
-                else
-                    navMeshAgent.stoppingDistance = stopDistance;
-
-                if (hit.collider.gameObject.tag.In("Player", "Bullet"))
+                if (!hit.collider.gameObject.tag.In("Box", "Barrel"))
                 {
                     currentCD -= Time.fixedDeltaTime;
                     if (currentCD <= 0)
@@ -111,16 +112,15 @@ public class enemyScript : MonoBehaviour
     }
 
     void Flash()
- {  
+    {
         spriteRenderer.color = Color.white;
-     Invoke("ResetColor", flashTime);
- }
+        Invoke("ResetColor", flashTime);
+    }
 
-     void ResetColor()
- {
-   
+    void ResetColor()
+    {
         spriteRenderer.color = origionalColor;
- }
+    }
 
     void Death()
     {
