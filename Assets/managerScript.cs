@@ -90,6 +90,7 @@ public class managerScript : MonoBehaviour
 
     void AddEnemies()
     {
+        this.Log(amountDict["Enemy"]);
         currentPower += 50; //* currentWave  + 150;
         List<string> spawns = GetEnemies();
 
@@ -98,15 +99,20 @@ public class managerScript : MonoBehaviour
             this.Log(spawns[i]);
             amountDict[spawns[i]]++;
         }
+        this.Log(amountDict["Enemy"]);
         List<string> keyList = new List<string>(amountDict.Keys);
         foreach (string enemy in keyList)
         {
             amountDict[enemy] += objectLists[objectDict[enemy]].Count;
         }
+        for (int i = 0; i < objectLists.Count; i++)
+            objectLists[i].Clear();
+        this.Log(amountDict["Enemy"]);
     }
 
     List<string> GetEnemies()
     {
+        this.Log(currentPower);
         List<string> spawns = new List<string>();
         while (currentPower > 0)
         {
@@ -125,10 +131,7 @@ public class managerScript : MonoBehaviour
     {
         for (int i = 0; i < objectLists.Count; i++)
             objectLists[i].RemoveAll(s => s == null);
-
         currentWave++;
-
-        //AddEnemies();
         StartCoroutine(DestroyObjects());
     }
 
@@ -148,8 +151,6 @@ public class managerScript : MonoBehaviour
         }
         yield return wait;
         state = "Generating";
-        for (int i = 0; i < objectLists.Count; i++)
-            objectLists[i].Clear();
         objectSpots.Clear();
         NewMap();
     }
@@ -210,7 +211,7 @@ public class managerScript : MonoBehaviour
 
         //enemies
         enemySpots.Shuffle();
-        for (int i = 0; i < amountDict["Enemy"]; i++)
+        for (int i = amountDict["Enemy"]; i > 0; i--)
         {
             Vector3 pos = new Vector3(
                 (enemySpots[i].x + 0.5f) * objectSize.x - screenSize.x,
@@ -218,6 +219,7 @@ public class managerScript : MonoBehaviour
                 0
             );
             GameObject spawned = Instantiate(enemy, pos, enemy.transform.rotation);
+            amountDict["Enemy"]--;
             objectLists[objectDict[spawned.tag]].Add(spawned);
             yield return wait;
         }

@@ -40,37 +40,40 @@ public class AIManager : MonoBehaviour
     public Vector3 GetPos(int oldPos, out int newPos)
     {
         list.Shuffle();
-        foreach (int i in list)
+        for (int j = 1; j < 4; j++)
         {
-            if (dict[i])
+            foreach (int i in list)
             {
-                Vector3 pos = new Vector3(
-                    Mathf.Cos(Mathf.Deg2Rad * 360 / spots * i) * radius,
-                    Mathf.Sin(Mathf.Deg2Rad * 360 / spots * i) * radius,
-                    0
-                );
-                RaycastHit2D hit = Physics2D.Linecast(
-                    player.transform.position + pos,
-                    player.transform.position
-                );
-                if (hit)
+                if (dict[i])
                 {
-                    if (
-                        hit.collider.gameObject.tag == "Player"
-                        && manager.InScreen(player.transform.position + pos)
-                    )
+                    Vector3 pos = new Vector3(
+                        Mathf.Cos(Mathf.Deg2Rad * 360 / spots * i) * radius / j,
+                        Mathf.Sin(Mathf.Deg2Rad * 360 / spots * i) * radius / j,
+                        0
+                    );
+                    RaycastHit2D hit = Physics2D.Linecast(
+                        player.transform.position + pos,
+                        player.transform.position
+                    );
+                    if (hit)
                     {
-                        dict[i] = false;
-                        if (oldPos != -1)
+                        if (
+                            hit.collider.gameObject.tag == "Player"
+                            && manager.InScreen(player.transform.position + pos)
+                        )
                         {
-                            dict[oldPos] = true;
+                            dict[i] = false;
+                            if (oldPos != -1)
+                                dict[oldPos] = true;
+                            newPos = i;
+                            return player.transform.position + pos;
                         }
-                        newPos = i;
-                        return player.transform.position + pos;
                     }
                 }
             }
         }
+        if (oldPos != -1)
+            dict[oldPos] = true;
         newPos = -1;
         return new Vector3(0, 0, 0);
     }

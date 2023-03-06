@@ -8,7 +8,7 @@ public class playerMovement : MonoBehaviour
     managerScript manager;
 
     public float moveSpeed;
-    private weaponScript weapon;
+    public weaponScript weapon;
     public Vector3 movement;
     public CircleCollider2D col;
     private Vector3 knockback = new Vector3();
@@ -30,7 +30,11 @@ public class playerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        knockback = new Vector3(Mathf.Lerp(knockback.x, 0, 0.2f), Mathf.Lerp(knockback.y, 0, 0.2f), 0);
+        knockback = new Vector3(
+            Mathf.Lerp(knockback.x, 0, 0.3f),
+            Mathf.Lerp(knockback.y, 0, 0.3f),
+            0
+        );
         if (manager.state == "Idle")
         {
             col.enabled = true;
@@ -67,21 +71,22 @@ public class playerMovement : MonoBehaviour
         }
     }
 
-    void Hit(Vector3 kb) {
+    void Hit(Vector3 kb)
+    {
         knockback = kb;
         Flash();
-     }
+    }
 
     void Flash()
- {  
-    foreach (SpriteRenderer renderer in renderers)
-        renderer.color = Color.white;
-     Invoke("ResetColor", flashTime);
- }
+    {
+        foreach (SpriteRenderer renderer in renderers)
+            renderer.color = Color.white;
+        Invoke("ResetColor", flashTime);
+    }
 
-     void ResetColor()
- {
-      foreach (SpriteRenderer renderer in renderers)
-        renderer.color = origionalColor;
- }
+    void ResetColor()
+    {
+        foreach (SpriteRenderer renderer in renderers)
+            renderer.color = origionalColor;
+    }
 }
