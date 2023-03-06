@@ -69,6 +69,7 @@ public class enemyScript : MonoBehaviour
         );
 
         //own values
+        //transform.position = new Vector3(transform.position.x, transform.position.y,0);
         spawnPos = transform.position;
         origionalColor = spriteRenderer.color;
         timer = maxTimer;
@@ -84,6 +85,9 @@ public class enemyScript : MonoBehaviour
         {
             if (state == "Idle")
             {
+                if (target != transform.position){
+                    this.Log(transform.position, target);
+                }
                 if (Vector3.Distance(target, transform.position) < 3)
                 {
                     timer -= Time.fixedDeltaTime;
@@ -240,7 +244,7 @@ public class enemyScript : MonoBehaviour
         GetComponent<CircleCollider2D>().enabled = false;
         navMeshAgent.enabled = false;
         Destroy(body);
-        Destroy(healthBar, 0f);
+        Destroy(healthBar, 2f);
         Destroy(triggerPS, 2f);
         Destroy(sleepPS, 2f);
         Destroy(gameObject, 2f);

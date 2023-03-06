@@ -68,6 +68,7 @@ public class playerMovement : MonoBehaviour
             );
             col.enabled = false;
             weapon.enabled = false;
+            weapon.recoil = new Vector3(0, 0, 0);
         }
     }
 

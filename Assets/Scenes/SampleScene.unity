@@ -5703,7 +5703,7 @@ MonoBehaviour:
   objectSize: {x: 0, y: 0, z: 0}
   navMesh: {fileID: 1207697300}
   state: Idle
-  maxTimer: 20
+  maxTimer: 15
   waveTimer: 0
   currentWave: 0
   currentPower: 0
@@ -5891,7 +5891,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 9.038273, y: 0, z: 0, w: 8.857498}
+  m_margin: {x: 9.038273, y: -0.0000038146973, z: 0, w: 8.857498}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
