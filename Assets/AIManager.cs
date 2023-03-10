@@ -5,15 +5,11 @@ using UnityEngine;
 public class AIManager : MonoBehaviour
 {
     public static AIManager instance { get; private set; }
-
-    GameObject managerObject;
-    managerScript manager;
     GameObject player;
 
-    List<Vector3> positions = new List<Vector3>();
-    Dictionary<int, bool> dict = new Dictionary<int, bool>();
+    public Dictionary<int, bool> dict = new Dictionary<int, bool>();
     List<int> list = new List<int>();
-    int spots = 12;
+    public int spots = 10;
     int radius = 10;
 
     void Awake()
@@ -27,8 +23,6 @@ public class AIManager : MonoBehaviour
     void Start()
     {
         player = GameObject.FindWithTag("Player");
-        managerObject = GameObject.FindWithTag("Manager");
-        manager = managerObject.GetComponent<managerScript>();
 
         for (int i = 0; i < spots; i++)
         {
@@ -59,7 +53,7 @@ public class AIManager : MonoBehaviour
                     {
                         if (
                             hit.collider.gameObject.tag == "Player"
-                            && manager.InScreen(player.transform.position + pos)
+                            && Manager.instance.InScreen(player.transform.position + pos)
                         )
                         {
                             dict[i] = false;

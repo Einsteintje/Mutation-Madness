@@ -6,8 +6,6 @@ using UnityEngine.AI;
 public class navMeshScript : MonoBehaviour
 {
     public NavMeshSurface2d surface;
-    GameObject managerObject;
-    managerScript manager;
 
     // Start is called before the first frame update
     void Start()

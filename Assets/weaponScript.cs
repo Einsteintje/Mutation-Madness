@@ -8,7 +8,7 @@ public class weaponScript : MonoBehaviour
     public float maxCD = 0.2f;
     public float currentCD = 0;
     public float ammo = 50;
-    public float kickback = 0.5f;
+    public float kickback = 1.5f;
     public Vector3 recoil = new Vector3(0, 0, 0);
     public ParticleSystem muzzleFlash;
 

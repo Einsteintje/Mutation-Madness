@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class bulletMovement : MonoBehaviour
 {
-    GameObject managerObject;
-    managerScript manager;
-
     public float moveSpeed;
     public float size;
     public Color color;
@@ -27,22 +24,19 @@ public class bulletMovement : MonoBehaviour
 
         transform.up = Quaternion.Euler(0, 0, -90) * transform.up;
         transform.localScale = new Vector3(size, size, 0);
-
-        managerObject = GameObject.FindWithTag("Manager");
-        manager = managerObject.GetComponent<managerScript>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         transform.position += transform.up * Time.fixedDeltaTime * moveSpeed;
-        if (manager.state == "Clearing" && ps != null && moveSpeed != 0)
+        if (Manager.instance.state == "Clearing" && ps != null && moveSpeed != 0)
             Death();
         if (
-            transform.position.y < -manager.screenSize.y
-            || transform.position.y > manager.screenSize.y
-            || transform.position.x < -manager.screenSize.x
-            || transform.position.x > manager.screenSize.x
+            transform.position.y < -Manager.instance.screenSize.y
+            || transform.position.y > Manager.instance.screenSize.y
+            || transform.position.x < -Manager.instance.screenSize.x
+            || transform.position.x > Manager.instance.screenSize.x
         )
             Destroy(gameObject, 1f);
     }

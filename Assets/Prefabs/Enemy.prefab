@@ -120,7 +120,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1310033277387042945}
-  - component: {fileID: 1310033277387042959}
   - component: {fileID: 1310033277387042947}
   - component: {fileID: 1310033277387042946}
   - component: {fileID: 1310033277387042948}
@@ -151,34 +150,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1310033277387042959
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1310033277387042956}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 373b52eb9bf8c40f785bb6947a1aee66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  version: 1
-  drawGizmos: 1
-  detailedGizmos: 0
-  startEndModifier:
-    addPoints: 0
-    exactStartPoint: 3
-    exactEndPoint: 3
-    useRaycasting: 0
-    mask:
-      serializedVersion: 2
-      m_Bits: 4294967295
-    useGraphRaycasting: 0
-  traversableTags: -1
-  tagPenalties: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-  graphMask:
-    value: -1
 --- !u!58 &1310033277387042947
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -228,19 +199,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0742639567a6f34fa34213754e4c447, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  body: {fileID: 4127705237257862438, guid: c745bbd0a4a5d8743a3d799b76c439d1, type: 3}
+  started: 0
+  maxHP: 2
+  hp: 2
+  timer: 0
+  maxTimer: 5
+  state: Idle
+  attackSpeed: 50
   deathPS: {fileID: 1310033277734978646}
   sleepPS: {fileID: 7429639333757569311}
   triggerPS: {fileID: 2716346773882258427}
+  knockback: {x: 0, y: 0, z: 0}
+  spriteRenderer: {fileID: 0}
+  origionalColor: {r: 0, g: 0, b: 0, a: 0}
+  flashTime: 0.05
   navMeshAgent: {fileID: -4153190954732011472}
+  body: {fileID: 4127705237257862438, guid: c745bbd0a4a5d8743a3d799b76c439d1, type: 3}
+  healthBar: {fileID: 968103364133973092, guid: d8bd2710f281aa54ea02b06c49ce4168, type: 3}
+  healthBarScript: {fileID: 0}
+  spawnPos: {x: 0, y: 0, z: 0}
+  target: {x: 0, y: 0, z: 0}
+  pos: -1
+  maxHealthTimer: 2
+  healthTimer: 0
   bulletSpeed: 50
   prediction: 2
-  maxCD: 1
+  maxCD: 2
   currentCD: 0
   bullet: {fileID: 3003856649541492482, guid: 2eeaa999ed865614cb237f5eef445937, type: 3}
-  hp: 5
-  maxHP: 5
-  healthBar: {fileID: 968103364133973092, guid: d8bd2710f281aa54ea02b06c49ce4168, type: 3}
 --- !u!195 &-4153190954732011472
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -250,7 +236,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 1310033277387042956}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.2
+  m_Radius: 0.3
   m_Speed: 30
   m_Acceleration: 50
   avoidancePriority: 99

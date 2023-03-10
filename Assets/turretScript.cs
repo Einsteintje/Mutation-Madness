@@ -4,14 +4,9 @@ using UnityEngine;
 
 public class turretScript : MonoBehaviour
 {
-    GameObject managerObject;
-    managerScript manager;
-
     public float maxCD = 0.5f;
     public float currentCD;
-    public GameObject player;
     public GameObject bullet;
-    public playerMovement playerScript;
     public float prediction;
     public float bulletSpeed;
     public float hp;
@@ -21,29 +16,24 @@ public class turretScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        player = GameObject.FindWithTag("Player");
-        playerScript = player.GetComponent<playerMovement>();
         ps = GetComponent<ParticleSystem>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-
-        managerObject = GameObject.FindWithTag("Manager");
-        manager = managerObject.GetComponent<managerScript>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (manager.state != "Clearing" && hp > 0)
+        if (Manager.instance.state != "Clearing" && hp > 0)
         {
             Vector3 offset = new Vector3(
-                player.transform.position.x - transform.position.x,
-                player.transform.position.y - transform.position.y,
+                Player.instance.transform.position.x - transform.position.x,
+                Player.instance.transform.position.y - transform.position.y,
                 0
             );
             offset = Vector3.ClampMagnitude(offset, 4.0f);
             RaycastHit2D hit = Physics2D.Linecast(
                 transform.position + offset,
-                player.transform.position
+                Player.instance.transform.position
             );
             if (hit)
             {
@@ -74,10 +64,10 @@ public class turretScript : MonoBehaviour
 
     float Angle()
     {
-        float y = player.transform.position.y - transform.position.y;
-        float x = player.transform.position.x - transform.position.x;
-        float yPrediction = Mathf.Abs(y) / bulletSpeed * playerScript.movement.y * 50;
-        float xPrediction = Mathf.Abs(x) / bulletSpeed * playerScript.movement.x * 50;
+        float y = Player.instance.transform.position.y - transform.position.y;
+        float x = Player.instance.transform.position.x - transform.position.x;
+        float yPrediction = Mathf.Abs(y) / bulletSpeed * Player.instance.movement.y * 50;
+        float xPrediction = Mathf.Abs(x) / bulletSpeed * Player.instance.movement.x * 50;
         return Mathf.Atan2(y + yPrediction, x + xPrediction) * Mathf.Rad2Deg;
     }
 
