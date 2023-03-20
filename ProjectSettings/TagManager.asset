@@ -10,6 +10,7 @@ TagManager:
   - Box
   - Barrel
   - Enemy
+  - Dasher
   layers:
   - Default
   - TransparentFX

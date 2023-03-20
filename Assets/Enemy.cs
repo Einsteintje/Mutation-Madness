@@ -11,6 +11,7 @@ public abstract class Enemy : MonoBehaviour
     public float maxTimer;
     public string state = "Idle";
     public float attackSpeed;
+    public int prediction;
 
     public ParticleSystem deathPS;
     public ParticleSystem sleepPS;
@@ -22,7 +23,6 @@ public abstract class Enemy : MonoBehaviour
     public float flashTime = 0.05f;
 
     public UnityEngine.AI.NavMeshAgent navMeshAgent;
-
 
     public GameObject body;
     public GameObject healthBar;
@@ -36,7 +36,25 @@ public abstract class Enemy : MonoBehaviour
     public int maxHealthTimer = 2;
     public float healthTimer;
 
-    public void SharedUpdate(){
+    public void SharedIdle()
+    {
+        if (Vector3.Distance(target, transform.position) < 3)
+        {
+            timer -= Time.fixedDeltaTime;
+            if (!sleepPS.isPlaying)
+                sleepPS.Play();
+            if (!IsInvoking("AddHealth"))
+                InvokeRepeating("AddHealth", 0.5f, 1.0f);
+        }
+
+        if (timer < 0)
+        {
+            WakeUp();
+        }
+    }
+
+    public void SharedUpdate()
+    {
         transform.position += knockback;
         body.transform.position = transform.position;
         healthBar.transform.position = transform.position + Vector3.up * 3;
@@ -50,9 +68,26 @@ public abstract class Enemy : MonoBehaviour
             healthTimer -= Time.fixedDeltaTime;
         else
             healthBarScript.FadeOut();
+        if (
+            (
+                Player.instance.weapon.recoil.x * Player.instance.weapon.recoil.y != 0
+                || Vector3.Distance(Player.instance.transform.position, transform.position) < 10
+            ) && !started
+        )
+        {
+            WakeUp();
+        }
+        if (started)
+            navMeshAgent.SetDestination(target);
+        knockback = new Vector3(
+            Mathf.Lerp(knockback.x, 0, 0.2f),
+            Mathf.Lerp(knockback.y, 0, 0.2f),
+            0
+        );
     }
 
-    public void SharedStart(){
+    public void SharedStart()
+    {
         body = Instantiate(body);
         healthBar = Instantiate(healthBar);
         healthBarScript = healthBar.GetComponent<healthBarScript>();
@@ -67,7 +102,8 @@ public abstract class Enemy : MonoBehaviour
         Invoke("SetSpawnPos", 0.05f);
     }
 
-    public void SetPS(){
+    public void SetPS()
+    {
         sleepPS = Instantiate(
             sleepPS,
             transform.position + Vector3.up * 2,
@@ -138,13 +174,13 @@ public abstract class Enemy : MonoBehaviour
         Destroy(gameObject, 2f);
     }
 
-    public float Angle(int prediction)
+    public float Angle()
     {
         float y = Player.instance.transform.position.y - transform.position.y;
         float x = Player.instance.transform.position.x - transform.position.x;
         float yPrediction = Mathf.Abs(y) / attackSpeed * Player.instance.movement.y * prediction;
         float xPrediction = Mathf.Abs(x) / attackSpeed * Player.instance.movement.x * prediction;
-        this.Log(x,y, yPrediction, xPrediction);
+        this.Log(x, y, yPrediction, xPrediction);
         return Mathf.Atan2(y + yPrediction, x + xPrediction) * Mathf.Rad2Deg;
     }
 
@@ -155,6 +191,4 @@ public abstract class Enemy : MonoBehaviour
     }
 
     public abstract void DisableCollider();
-
-    
 }

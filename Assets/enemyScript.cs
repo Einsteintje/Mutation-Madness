@@ -5,7 +5,6 @@ using UnityEngine;
 public class enemyScript : Enemy
 {
     //shooting
-    public float prediction;
     public float maxCD;
     public float currentCD;
     public GameObject bullet;
@@ -14,6 +13,7 @@ public class enemyScript : Enemy
     void Start()
     {
         SharedStart();
+        prediction = 50;
     }
 
     public override void DisableCollider(){
@@ -25,19 +25,7 @@ public class enemyScript : Enemy
         {
             if (state == "Idle")
             {
-                if (Vector3.Distance(target, transform.position) < 3)
-                {
-                    timer -= Time.fixedDeltaTime;
-                    if (!sleepPS.isPlaying)
-                        sleepPS.Play();
-                    if (!IsInvoking("AddHealth"))
-                        InvokeRepeating("AddHealth", 0.5f, 1.0f);
-                }
-
-                if (timer < 0)
-                {
-                    WakeUp();
-                }
+                SharedIdle();
             }
             else if (state == "Attack")
             {
@@ -68,23 +56,7 @@ public class enemyScript : Enemy
                         state = "Attack";
                 }
             }
-            if (started)
-                navMeshAgent.SetDestination(target);
-            knockback = new Vector3(
-                Mathf.Lerp(knockback.x, 0, 0.2f),
-                Mathf.Lerp(knockback.y, 0, 0.2f),
-                0
-            );
-            if (
-                (
-                    Player.instance.weapon.recoil.x * Player.instance.weapon.recoil.y != 0
-                    || Vector3.Distance(Player.instance.transform.position, transform.position) < 10
-                ) && !started
-            )
-            {
-                WakeUp();
-            }
-
+            
             SharedUpdate();
         }
     }
@@ -108,7 +80,7 @@ public class enemyScript : Enemy
                     GameObject spawned = Instantiate(
                         bullet,
                         transform.position + offset,
-                        Quaternion.Euler(new Vector3(0, 0, Angle(50)))
+                        Quaternion.Euler(new Vector3(0, 0, Angle()))
                     );
                     bulletMovement script = spawned.GetComponent<bulletMovement>();
                     script.moveSpeed =attackSpeed;

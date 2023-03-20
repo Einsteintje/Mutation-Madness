@@ -9,6 +9,7 @@ public class Manager : MonoBehaviour
     public GameObject barrel;
     public GameObject turret;
     public GameObject enemy;
+    public GameObject dasher;
     public Vector3 screenSize;
     public Vector3 objectSize;
     public GameObject navMesh;
@@ -31,22 +32,27 @@ public class Manager : MonoBehaviour
         { "Turret", 0 },
         { "Barrel", 1 },
         { "Enemy", 2 },
-        { "Box", 3 }
+        { "Box", 3 },
+        { "Dasher", 4 }
     };
 
     private Dictionary<string, int> powerDict = new Dictionary<string, int>
     {
         { "Turret", 100 },
-        { "Enemy", 10 }
+        { "Enemy", 10 },
+        { "Dasher", 51 }
     };
 
     private Dictionary<string, int> amountDict = new Dictionary<string, int>
     {
         { "Turret", 0 },
-        { "Enemy", 0 }
+        { "Enemy", 0 },
+        { "Dasher", 0 }
     };
 
-    private List<string> enemies = new List<string> { "Turret", "Enemy" };
+    private Dictionary<string, GameObject> enemiesDict = new Dictionary<string, GameObject>();
+
+    private List<string> enemies = new List<string> { "Turret", "Enemy", "Dasher" };
 
     private List<Vector2Int> objectSpots = new List<Vector2Int>();
     private List<Vector2Int> enemySpots = new List<Vector2Int>();
@@ -61,6 +67,9 @@ public class Manager : MonoBehaviour
             Destroy(this.gameObject);
         else
             instance = this;
+
+        enemiesDict["Enemy"] = enemy;
+        enemiesDict["Dasher"] = dasher;
     }
 
     void Start()
@@ -197,17 +206,24 @@ public class Manager : MonoBehaviour
 
         //enemies
         enemySpots.Shuffle();
-        for (int i = amountDict["Enemy"]; i > 0; i--)
+        foreach (string enemyName in enemiesDict.Keys)
         {
-            Vector3 pos = new Vector3(
-                (enemySpots[i].x + 0.5f) * objectSize.x - screenSize.x,
-                (enemySpots[i].y + 0.5f) * objectSize.y - screenSize.y,
-                0
-            );
-            GameObject spawned = Instantiate(enemy, pos, enemy.transform.rotation);
-            amountDict["Enemy"]--;
-            objectLists[objectDict[spawned.tag]].Add(spawned);
-            yield return wait;
+            for (int i = amountDict[enemyName]; i > 0; i--)
+            {
+                Vector3 pos = new Vector3(
+                    (enemySpots[i].x + 0.5f) * objectSize.x - screenSize.x,
+                    (enemySpots[i].y + 0.5f) * objectSize.y - screenSize.y,
+                    0
+                );
+                GameObject spawned = Instantiate(
+                    enemiesDict[enemyName],
+                    pos,
+                    enemiesDict[enemyName].transform.rotation
+                );
+                amountDict[enemyName]--;
+                objectLists[objectDict[spawned.tag]].Add(spawned);
+                yield return wait;
+            }
         }
 
         List<Vector2Int> spots = new List<Vector2Int>();
