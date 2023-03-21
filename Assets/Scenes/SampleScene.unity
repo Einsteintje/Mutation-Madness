@@ -5029,7 +5029,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 151233135}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -21015,12 +21015,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bullet: {fileID: 3003856649541492482, guid: 2eeaa999ed865614cb237f5eef445937, type: 3}
-  maxCD: 1
+  maxCD: 0.2
   currentCD: 0.1
   ammo: 500
   kickback: 0.5
   recoil: {x: 0, y: 0, z: 0}
   muzzleFlash: {fileID: 1160429308}
+  attackSpeed: 100
 --- !u!1 &2071152184
 GameObject:
   m_ObjectHideFlags: 0

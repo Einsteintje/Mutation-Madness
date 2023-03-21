@@ -22,7 +22,7 @@ public class Manager : MonoBehaviour
     private float currentOffset;
     public string state = "Idle";
 
-    public int maxTimer = 5;
+    public int maxTimer = 30;
     public float waveTimer;
     public int currentWave = 0;
     public int currentPower = 0;
@@ -32,15 +32,15 @@ public class Manager : MonoBehaviour
         { "Turret", 0 },
         { "Barrel", 1 },
         { "Enemy", 2 },
-        { "Box", 3 },
-        { "Dasher", 4 }
+        { "Dasher", 3 },
+        { "Box", 4 }
     };
 
     private Dictionary<string, int> powerDict = new Dictionary<string, int>
     {
-        { "Turret", 100 },
-        { "Enemy", 10 },
-        { "Dasher", 51 }
+        { "Turret", 130 },
+        { "Enemy", 5 },
+        { "Dasher", 5 }
     };
 
     private Dictionary<string, int> amountDict = new Dictionary<string, int>
@@ -119,7 +119,7 @@ public class Manager : MonoBehaviour
 
     void AddEnemies()
     {
-        currentPower += 50; //* currentWave  + 150;
+        currentPower += 100 + currentWave * 50;
         List<string> spawns = new List<string>();
 
         //get strongest enemy spawn

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2113730280406920749}
   - component: {fileID: 9011007288119969244}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Light 2D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -124,7 +124,7 @@ GameObject:
   - component: {fileID: 1310033277387042946}
   - component: {fileID: 1310033277387042948}
   - component: {fileID: -4153190954732011472}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -139,7 +139,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1310033277387042956}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -11.696329, y: 7.2484, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 4, y: 4, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -199,33 +199,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0742639567a6f34fa34213754e4c447, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  started: 0
   maxHP: 2
-  hp: 2
-  timer: 0
-  maxTimer: 5
-  state: Idle
-  attackSpeed: 50
+  maxHealthTimer: 2
+  maxStateTimer: 5
+  maxCD: 1
+  attackSpeed: 100
+  prediction: 50
+  flashTime: 0.05
   deathPS: {fileID: 1310033277734978646}
   sleepPS: {fileID: 7429639333757569311}
   triggerPS: {fileID: 2716346773882258427}
-  knockback: {x: 0, y: 0, z: 0}
-  spriteRenderer: {fileID: 0}
-  origionalColor: {r: 0, g: 0, b: 0, a: 0}
-  flashTime: 0.05
-  navMeshAgent: {fileID: -4153190954732011472}
   body: {fileID: 4127705237257862438, guid: c745bbd0a4a5d8743a3d799b76c439d1, type: 3}
   healthBar: {fileID: 968103364133973092, guid: d8bd2710f281aa54ea02b06c49ce4168, type: 3}
-  healthBarScript: {fileID: 0}
+  navMeshAgent: {fileID: -4153190954732011472}
+  state: Idle
+  started: 0
+  currentStateTimer: 0
+  currentCD: 0
+  currentHealthTimer: 0
+  currentHP: 0
+  altPos: {x: 0, y: 0, z: 0}
+  knockback: {x: 0, y: 0, z: 0}
   spawnPos: {x: 0, y: 0, z: 0}
   target: {x: 0, y: 0, z: 0}
+  spriteRenderer: {fileID: 0}
+  origionalColor: {r: 0, g: 0, b: 0, a: 0}
+  healthBarScript: {fileID: 0}
   pos: -1
-  maxHealthTimer: 2
-  healthTimer: 0
-  bulletSpeed: 50
-  prediction: 2
-  maxCD: 2
-  currentCD: 0
   bullet: {fileID: 3003856649541492482, guid: 2eeaa999ed865614cb237f5eef445937, type: 3}
 --- !u!195 &-4153190954732011472
 NavMeshAgent:

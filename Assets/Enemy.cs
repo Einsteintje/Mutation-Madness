@@ -4,86 +4,129 @@ using UnityEngine;
 
 public abstract class Enemy : MonoBehaviour
 {
-    public bool started = false;
-    public int maxHP;
-    public int hp;
-    public float timer;
-    public float maxTimer;
-    public string state = "Idle";
-    public float attackSpeed;
-    public int prediction;
+    public int maxHP,
+        maxHealthTimer,
+        maxStateTimer,
+        maxCD,
+        attackSpeed,
+        prediction;
+    public float flashTime;
 
-    public ParticleSystem deathPS;
-    public ParticleSystem sleepPS;
-    public ParticleSystem triggerPS;
-
-    public Vector3 knockback = new Vector3();
-    public SpriteRenderer spriteRenderer;
-    public Color origionalColor;
-    public float flashTime = 0.05f;
-
+    public ParticleSystem deathPS,
+        sleepPS,
+        triggerPS;
+    public GameObject body,
+        healthBar;
     public UnityEngine.AI.NavMeshAgent navMeshAgent;
 
-    public GameObject body;
-    public GameObject healthBar;
+    [HideInInspector]
+    public string state = "Idle";
+
+    [HideInInspector]
+    public bool started = false;
+
+    [HideInInspector]
+    public float currentStateTimer,
+        currentCD,
+        currentHealthTimer;
+
+    [HideInInspector]
+    public int currentHP;
+
+    [HideInInspector]
+    public Vector3 knockback,
+        target = new Vector3();
+
+    [HideInInspector]
+    public Vector3 spawnPos,
+        altPos;
+
+    [HideInInspector]
+    public SpriteRenderer spriteRenderer;
+
+    [HideInInspector]
+    public Color origionalColor;
+
+    [HideInInspector]
     public healthBarScript healthBarScript;
 
-    public Vector3 spawnPos;
-    public Vector3 target;
-
+    [HideInInspector]
     public int pos = -1;
-
-    public int maxHealthTimer = 2;
-    public float healthTimer;
-
-    public void SharedIdle()
-    {
-        if (Vector3.Distance(target, transform.position) < 3)
-        {
-            timer -= Time.fixedDeltaTime;
-            if (!sleepPS.isPlaying)
-                sleepPS.Play();
-            if (!IsInvoking("AddHealth"))
-                InvokeRepeating("AddHealth", 0.5f, 1.0f);
-        }
-
-        if (timer < 0)
-        {
-            WakeUp();
-        }
-    }
 
     public void SharedUpdate()
     {
-        transform.position += knockback;
-        body.transform.position = transform.position;
-        healthBar.transform.position = transform.position + Vector3.up * 3;
-        if (hp != healthBarScript.currentHP)
+        if (Manager.instance.state != "Clearing" && currentHP > 0)
         {
-            healthBarScript.FadeIn();
-            healthBarScript.UpdateSlider(hp, maxHP);
-            healthTimer = maxHealthTimer;
+            if (state == "Idle")
+            {
+                if (Vector3.Distance(target, transform.position) < 3)
+                {
+                    currentStateTimer -= Time.fixedDeltaTime;
+                    if (!sleepPS.isPlaying)
+                        sleepPS.Play();
+                    if (!IsInvoking("AddHealth"))
+                        InvokeRepeating("AddHealth", 0.5f, 1.0f);
+                }
+
+                if (currentStateTimer < 0)
+                {
+                    WakeUp();
+                }
+            }
+            else if (state == "Attack")
+            {
+                Attack();
+                AttackMovingPattern();
+                if (target.x * target.y == 0)
+                {
+                    if (currentHP < maxHP)
+                        state = "Idle";
+                    else
+                        state = "AltAttack";
+                    target = altPos;
+                }
+            }
+            else if (state == "AltAttack")
+            {
+                this.Log(target);
+                if (Vector3.Distance(target, transform.position) < 3)
+                {
+                    currentStateTimer -= Time.fixedDeltaTime;
+                    AltAttack();
+                    if (currentStateTimer < 0)
+                        state = "Attack";
+                }
+            }
+            transform.position += knockback;
+            body.transform.position = transform.position;
+            healthBar.transform.position = transform.position + Vector3.up * 3;
+            if (currentHP != healthBarScript.currentHP)
+            {
+                healthBarScript.FadeIn();
+                healthBarScript.UpdateSlider(currentHP, maxHP);
+                currentHealthTimer = maxHealthTimer;
+            }
+            else if (currentHealthTimer > 0)
+                currentHealthTimer -= Time.fixedDeltaTime;
+            else
+                healthBarScript.FadeOut();
+            if (
+                (
+                    Player.instance.weapon.recoil.x * Player.instance.weapon.recoil.y != 0
+                    || Vector3.Distance(Player.instance.transform.position, transform.position) < 10
+                ) && !started
+            )
+            {
+                WakeUp();
+            }
+            if (started && target != navMeshAgent.destination && navMeshAgent.enabled)
+                navMeshAgent.SetDestination(target);
+            knockback = new Vector3(
+                Mathf.Lerp(knockback.x, 0, 0.2f),
+                Mathf.Lerp(knockback.y, 0, 0.2f),
+                0
+            );
         }
-        else if (healthTimer > 0)
-            healthTimer -= Time.fixedDeltaTime;
-        else
-            healthBarScript.FadeOut();
-        if (
-            (
-                Player.instance.weapon.recoil.x * Player.instance.weapon.recoil.y != 0
-                || Vector3.Distance(Player.instance.transform.position, transform.position) < 10
-            ) && !started
-        )
-        {
-            WakeUp();
-        }
-        if (started)
-            navMeshAgent.SetDestination(target);
-        knockback = new Vector3(
-            Mathf.Lerp(knockback.x, 0, 0.2f),
-            Mathf.Lerp(knockback.y, 0, 0.2f),
-            0
-        );
     }
 
     public void SharedStart()
@@ -94,10 +137,10 @@ public abstract class Enemy : MonoBehaviour
         spriteRenderer = body.GetComponent<SpriteRenderer>();
 
         origionalColor = spriteRenderer.color;
-        timer = maxTimer;
-        hp = maxHP;
+        currentStateTimer = maxStateTimer;
+        currentHP = maxHP;
         healthBarScript.canvasGroup.alpha = 0;
-        healthBarScript.currentHP = hp;
+        healthBarScript.currentHP = currentHP;
         SetPS();
         Invoke("SetSpawnPos", 0.05f);
     }
@@ -118,15 +161,15 @@ public abstract class Enemy : MonoBehaviour
 
     public void AddHealth()
     {
-        if (hp < maxHP)
-            hp++;
+        if (currentHP < maxHP)
+            currentHP++;
     }
 
     public void WakeUp()
     {
         started = true;
         CancelInvoke("AddHealth");
-        timer = maxTimer;
+        currentStateTimer = maxStateTimer;
         state = "Attack";
         sleepPS.Stop();
         if (!triggerPS.isPlaying)
@@ -137,11 +180,11 @@ public abstract class Enemy : MonoBehaviour
     public void Hit(Vector3 kb)
     {
         knockback = kb;
-        hp--;
+        currentHP--;
         if (state == "Idle")
             WakeUp();
 
-        if (hp <= 0)
+        if (currentHP <= 0)
             Death();
         else
             Flash();
@@ -162,7 +205,7 @@ public abstract class Enemy : MonoBehaviour
     {
         CancelInvoke("AddHealth");
         healthBarScript.canvasGroup.alpha = 0;
-        hp = 0;
+        currentHP = 0;
         deathPS.Play();
         sleepPS.Stop();
         DisableCollider();
@@ -180,7 +223,6 @@ public abstract class Enemy : MonoBehaviour
         float x = Player.instance.transform.position.x - transform.position.x;
         float yPrediction = Mathf.Abs(y) / attackSpeed * Player.instance.movement.y * prediction;
         float xPrediction = Mathf.Abs(x) / attackSpeed * Player.instance.movement.x * prediction;
-        this.Log(x, y, yPrediction, xPrediction);
         return Mathf.Atan2(y + yPrediction, x + xPrediction) * Mathf.Rad2Deg;
     }
 
@@ -191,4 +233,10 @@ public abstract class Enemy : MonoBehaviour
     }
 
     public abstract void DisableCollider();
+
+    public abstract void Attack(bool overwrite = false);
+
+    public abstract void AltAttack();
+
+    public abstract void AttackMovingPattern();
 }

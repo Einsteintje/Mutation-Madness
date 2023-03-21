@@ -49,7 +49,7 @@ public class turretScript : MonoBehaviour
                         );
                         bulletMovement script = spawned.GetComponent<bulletMovement>();
                         script.moveSpeed = bulletSpeed;
-                        script.size = 1f;
+                        script.size = 2f;
                         script.color = Color.red;
                         currentCD = maxCD;
                     }
@@ -66,8 +66,9 @@ public class turretScript : MonoBehaviour
     {
         float y = Player.instance.transform.position.y - transform.position.y;
         float x = Player.instance.transform.position.x - transform.position.x;
-        float yPrediction = Mathf.Abs(y) / bulletSpeed * Player.instance.movement.y * 50;
-        float xPrediction = Mathf.Abs(x) / bulletSpeed * Player.instance.movement.x * 50;
+        float yPrediction = Mathf.Abs(y) / bulletSpeed * Player.instance.movement.y * prediction;
+        float xPrediction = Mathf.Abs(x) / bulletSpeed * Player.instance.movement.x * prediction;
+        ;
         return Mathf.Atan2(y + yPrediction, x + xPrediction) * Mathf.Rad2Deg;
     }
 

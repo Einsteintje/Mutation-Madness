@@ -5,12 +5,13 @@ using UnityEngine;
 public class weaponScript : MonoBehaviour
 {
     public GameObject bullet;
-    public float maxCD = 0.2f;
-    public float currentCD = 0;
-    public float ammo = 50;
+    public float maxCD;
+    public float currentCD;
+    public float ammo;
     public float kickback = 1.5f;
     public Vector3 recoil = new Vector3(0, 0, 0);
     public ParticleSystem muzzleFlash;
+    public float attackSpeed = 100;
 
     // Start is called before the first frame update
     void Start() { }
@@ -47,8 +48,8 @@ public class weaponScript : MonoBehaviour
     void BulletStats(GameObject spawned)
     {
         bulletMovement script = spawned.GetComponent<bulletMovement>();
-        script.moveSpeed = 50;
-        script.size = 1f;
+        script.moveSpeed = 100;
+        script.size = 2f;
         script.color = Color.cyan;
     }
 }

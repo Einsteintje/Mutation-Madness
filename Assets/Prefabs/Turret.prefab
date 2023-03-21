@@ -5029,11 +5029,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxCD: 0.5
   currentCD: 0
-  player: {fileID: 0}
   bullet: {fileID: 3003856649541492482, guid: 2eeaa999ed865614cb237f5eef445937, type: 3}
-  playerScript: {fileID: 0}
-  prediction: 2
-  bulletSpeed: 50
+  prediction: 50
+  bulletSpeed: 80
   hp: 10
 --- !u!61 &8516570448945559945
 BoxCollider2D:
