@@ -6,15 +6,15 @@ public class Dasher : Enemy
 {
     bool dashing = false;
     float dashTimer;
-    float maxDashTimer = 0.3f;
+
+    [SerializeField]
+    float maxDashTimer;
     TrailRenderer trailRenderer;
 
     // Start is called before the first frame update
     void Start()
     {
         SharedStart();
-        prediction = 60;
-        attackSpeed = 80;
         dashTimer = maxDashTimer;
         trailRenderer = body.GetComponent<TrailRenderer>();
     }

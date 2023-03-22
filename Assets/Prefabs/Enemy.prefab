@@ -206,6 +206,7 @@ MonoBehaviour:
   attackSpeed: 100
   prediction: 50
   flashTime: 0.05
+  knockbackLerpSpeed: 0.3
   deathPS: {fileID: 1310033277734978646}
   sleepPS: {fileID: 7429639333757569311}
   triggerPS: {fileID: 2716346773882258427}
@@ -218,10 +219,10 @@ MonoBehaviour:
   currentCD: 0
   currentHealthTimer: 0
   currentHP: 0
-  altPos: {x: 0, y: 0, z: 0}
   knockback: {x: 0, y: 0, z: 0}
-  spawnPos: {x: 0, y: 0, z: 0}
   target: {x: 0, y: 0, z: 0}
+  spawnPos: {x: 0, y: 0, z: 0}
+  altPos: {x: 0, y: 0, z: 0}
   spriteRenderer: {fileID: 0}
   origionalColor: {r: 0, g: 0, b: 0, a: 0}
   healthBarScript: {fileID: 0}

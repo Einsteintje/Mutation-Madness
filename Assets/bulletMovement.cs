@@ -19,8 +19,8 @@ public class bulletMovement : MonoBehaviour
         ParticleSystem.MainModule main = ps.main;
         main.startColor = color;
         GetComponent<SpriteRenderer>().color = color;
-        GetComponent<TrailRenderer>().startColor = color;
-        GetComponent<TrailRenderer>().endColor = color;
+        //GetComponent<TrailRenderer>().startColor = color;
+        //GetComponent<TrailRenderer>().endColor = color;
 
         transform.up = Quaternion.Euler(0, 0, -90) * transform.up;
         transform.localScale = new Vector3(size, size, 0);
@@ -53,6 +53,7 @@ public class bulletMovement : MonoBehaviour
 
     void Death()
     {
+        ScreenShake.instance.Shake();
         moveSpeed = 0;
         GetComponent<CircleCollider2D>().enabled = false;
         GetComponent<SpriteRenderer>().enabled = false;

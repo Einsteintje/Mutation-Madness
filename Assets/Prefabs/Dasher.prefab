@@ -4928,6 +4928,7 @@ MonoBehaviour:
   attackSpeed: 80
   prediction: 50
   flashTime: 0.05
+  knockbackLerpSpeed: 0.3
   deathPS: {fileID: 1576116688634938878}
   sleepPS: {fileID: 7599128233416065150}
   triggerPS: {fileID: 8924496271582242763}
@@ -4940,14 +4941,15 @@ MonoBehaviour:
   currentCD: 0
   currentHealthTimer: 0
   currentHP: 0
-  altPos: {x: 0, y: 0, z: 0}
   knockback: {x: 0, y: 0, z: 0}
-  spawnPos: {x: 0, y: 0, z: 0}
   target: {x: 0, y: 0, z: 0}
+  spawnPos: {x: 0, y: 0, z: 0}
+  altPos: {x: 0, y: 0, z: 0}
   spriteRenderer: {fileID: 0}
   origionalColor: {r: 0, g: 0, b: 0, a: 0}
   healthBarScript: {fileID: 0}
   pos: -1
+  maxDashTimer: 0
 --- !u!1 &7061506211079813315
 GameObject:
   m_ObjectHideFlags: 0

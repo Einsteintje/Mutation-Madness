@@ -10,7 +10,8 @@ public abstract class Enemy : MonoBehaviour
         maxCD,
         attackSpeed,
         prediction;
-    public float flashTime;
+    public float flashTime,
+        knockbackLerpSpeed;
 
     public ParticleSystem deathPS,
         sleepPS,
@@ -122,8 +123,8 @@ public abstract class Enemy : MonoBehaviour
             if (started && target != navMeshAgent.destination && navMeshAgent.enabled)
                 navMeshAgent.SetDestination(target);
             knockback = new Vector3(
-                Mathf.Lerp(knockback.x, 0, 0.2f),
-                Mathf.Lerp(knockback.y, 0, 0.2f),
+                Mathf.Lerp(knockback.x, 0, knockbackLerpSpeed),
+                Mathf.Lerp(knockback.y, 0, knockbackLerpSpeed),
                 0
             );
         }
