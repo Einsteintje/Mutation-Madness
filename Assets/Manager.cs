@@ -39,8 +39,8 @@ public class Manager : MonoBehaviour
     private Dictionary<string, int> powerDict = new Dictionary<string, int>
     {
         { "Turret", 130 },
-        { "Enemy", 5 },
-        { "Dasher", 5 }
+        { "Enemy", 20 },
+        { "Dasher", 10 }
     };
 
     private Dictionary<string, int> amountDict = new Dictionary<string, int>
@@ -119,7 +119,7 @@ public class Manager : MonoBehaviour
 
     void AddEnemies()
     {
-        currentPower += 100 + currentWave * 50;
+        currentPower += 40 + currentWave * 50;
         List<string> spawns = new List<string>();
 
         //get strongest enemy spawn

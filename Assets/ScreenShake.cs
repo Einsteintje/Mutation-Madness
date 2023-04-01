@@ -6,7 +6,7 @@ using DG.Tweening;
 public class ScreenShake : MonoBehaviour
 {
     public static ScreenShake instance { get; private set; }
-    public Camera camera;
+    Vector3 originalPos;
 
     void Awake()
     {
@@ -16,10 +16,14 @@ public class ScreenShake : MonoBehaviour
             instance = this;
     }
 
+    void Start(){
+        originalPos = Camera.main.transform.position;
+    }
+
     void Update() { }
 
     public void Shake()
     {
-        camera.DOShakePosition(0.1f, 10, 10, 50, true);
+        Camera.main.DOShakePosition(0.05f, 1, 20,50, true, ShakeRandomnessMode.Harmonic).OnComplete(() => transform.position = originalPos);
     }
 }
