@@ -24,6 +24,7 @@ public class weaponScript : MonoBehaviour
             Vector3 spawnPos = transform.position + Quaternion.Euler(0, 0, -90) * transform.up * 4f;
             muzzleFlash.transform.position = spawnPos;
             muzzleFlash.Play();
+            AudioManager.instance.shootSound.Play();
 
             GameObject spawned = Instantiate(bullet, spawnPos, transform.rotation);
             BulletStats(spawned);

@@ -1,18 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 public class Player : MonoBehaviour
 {
     public static Player instance { get; private set; }
     public float moveSpeed;
     public weaponScript weapon;
-    public Vector3 movement;
+    public ParticleSystem hitPS;
     public CircleCollider2D col;
-    private Vector3 knockback = new Vector3();
-    public SpriteRenderer[] renderers;
-    Color origionalColor;
+    Vector3 knockback = new Vector3();
     float flashTime = 0.05f;
+
+    [HideInInspector]
+    public Vector3 movement;
+
+    [HideInInspector]
+    public SpriteRenderer[] renderers;
+
+    [HideInInspector]
+    public Color color;
+
+    [SerializeField]
+    Volume volume;
+    Vignette vignette;
 
     void Awake()
     {
@@ -27,12 +40,19 @@ public class Player : MonoBehaviour
     {
         weapon = GetComponentInChildren<weaponScript>();
         renderers = GetComponentsInChildren<SpriteRenderer>();
-        origionalColor = renderers[0].color;
+        volume.profile.TryGet(out vignette);
+        color = renderers[0].color;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        vignette.center.value = new Vector2(
+            (transform.position.x / 2 + Manager.instance.screenSize.x / 2)
+                / (Manager.instance.screenSize.x),
+            (transform.position.y / 2 + Manager.instance.screenSize.y / 2)
+                / (Manager.instance.screenSize.y)
+        );
         knockback = new Vector3(
             Mathf.Lerp(knockback.x, 0, 0.3f),
             Mathf.Lerp(knockback.y, 0, 0.3f),
@@ -78,6 +98,10 @@ public class Player : MonoBehaviour
     void Hit(Vector3 kb)
     {
         knockback = kb;
+        ParticleSystem ps = Instantiate(hitPS, Manager.instance.transform);
+        ps.transform.rotation = Quaternion.Euler(kb);
+        ps.transform.position = transform.position;
+        ps.Play();
         Flash();
     }
 
@@ -91,6 +115,6 @@ public class Player : MonoBehaviour
     void ResetColor()
     {
         foreach (SpriteRenderer renderer in renderers)
-            renderer.color = origionalColor;
+            renderer.color = color;
     }
 }

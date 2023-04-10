@@ -6,6 +6,9 @@ public class boxScript : MonoBehaviour
 {
     UnityEngine.Rendering.Universal.Light2D light2d;
 
+    [SerializeField]
+    ParticleSystem ps;
+
     void Hit()
     {
         Death();
@@ -13,8 +16,14 @@ public class boxScript : MonoBehaviour
 
     void Death()
     {
+        if (GetComponent<BoxCollider2D>().enabled)
+        {
+            ps = Instantiate(ps, Manager.instance.transform);
+            ps.transform.position = transform.position;
+            ps.Play();
+        }
+        AudioManager.instance.breakSound.Play();
         GetComponent<BoxCollider2D>().enabled = false;
-        GetComponent<ParticleSystem>().Play();
         GetComponent<SpriteRenderer>().enabled = false;
         InvokeRepeating("Lights", 0.0f, 0.02f);
         light2d = GetComponentInChildren<UnityEngine.Rendering.Universal.Light2D>();

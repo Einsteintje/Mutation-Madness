@@ -39,8 +39,8 @@ public class Manager : MonoBehaviour
     private Dictionary<string, int> powerDict = new Dictionary<string, int>
     {
         { "Turret", 130 },
-        { "Enemy", 20 },
-        { "Dasher", 10 }
+        { "Enemy", 10 },
+        { "Dasher", 40 }
     };
 
     private Dictionary<string, int> amountDict = new Dictionary<string, int>
@@ -52,7 +52,7 @@ public class Manager : MonoBehaviour
 
     private Dictionary<string, GameObject> enemiesDict = new Dictionary<string, GameObject>();
 
-    private List<string> enemies = new List<string> { "Turret", "Enemy", "Dasher" };
+    public List<string> enemies = new List<string> { "Turret", "Enemy", "Dasher" };
 
     private List<Vector2Int> objectSpots = new List<Vector2Int>();
     private List<Vector2Int> enemySpots = new List<Vector2Int>();
@@ -159,7 +159,8 @@ public class Manager : MonoBehaviour
 
     IEnumerator DestroyObjects()
     {
-        WaitForSeconds wait = new WaitForSeconds(0.005f);
+        WaitForSeconds wait = new WaitForSeconds(0.003f);
+        WaitForSeconds shorterWait = new WaitForSeconds(0.001f);
         foreach (List<GameObject> objectList in objectLists)
             for (int i = 0; i < objectList.Count; i++)
             {
@@ -169,6 +170,21 @@ public class Manager : MonoBehaviour
                 yield return wait;
             }
         yield return wait;
+        ParticleSystem[] psList = GetComponentsInChildren<ParticleSystem>();
+        for (int i = 0; i < psList.Length; i++)
+        {
+            UnityEngine.ParticleSystem.Particle[] particles =
+                new UnityEngine.ParticleSystem.Particle[psList[i].particleCount];
+            int numParticles = psList[i].GetParticles(particles);
+
+            for (int time = 0; time < numParticles; time++)
+            {
+                particles[time].remainingLifetime = 0.01f;
+            }
+            psList[i].SetParticles(particles, numParticles);
+            Destroy(psList[i], 1);
+            yield return shorterWait;
+        }
         state = "Generating";
         objectSpots.Clear();
         NewMap();
@@ -176,7 +192,7 @@ public class Manager : MonoBehaviour
 
     IEnumerator LoadMap(List<List<float>> list)
     {
-        WaitForSeconds wait = new WaitForSeconds(0.005f);
+        WaitForSeconds wait = new WaitForSeconds(0.003f);
 
         //boxes
         Vector2Int middle = new Vector2Int(list[0].Count / 2, list.Count / 2);
@@ -220,6 +236,7 @@ public class Manager : MonoBehaviour
                     pos,
                     enemiesDict[enemyName].transform.rotation
                 );
+                enemySpots.RemoveAt(i);
                 amountDict[enemyName]--;
                 objectLists[objectDict[spawned.tag]].Add(spawned);
                 yield return wait;
@@ -278,10 +295,10 @@ public class Manager : MonoBehaviour
     List<List<float>> GenerateMap()
     {
         List<List<float>> list = new List<List<float>>();
-        for (int y = 0; y < 1080 / 60; y++)
+        for (int y = 0; y < screenSize.y / 2; y++)
         {
             list.Add(new List<float>());
-            for (int x = 0; x < 1920 / 60; x++)
+            for (int x = 0; x < screenSize.x / 2; x++)
             {
                 list[y].Add(Mathf.PerlinNoise(x * scale + currentOffset, y * scale + 30));
             }

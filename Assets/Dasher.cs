@@ -54,13 +54,27 @@ public class Dasher : Enemy
             transform.position += transform.up * Time.fixedDeltaTime * attackSpeed;
             dashTimer -= Time.fixedDeltaTime;
         }
-        if (dashTimer < 0)
+        if (dashTimer <= 0)
         {
             trailRenderer.emitting = false;
             dashTimer = maxDashTimer;
             navMeshAgent.enabled = true;
             dashing = false;
             target = AIManager.instance.GetPos(pos, out pos);
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D other)
+    {
+        if (
+            dashing
+            && other.gameObject.tag != "Bullet"
+            && !Manager.instance.enemies.Contains(other.gameObject.tag)
+        )
+        {
+            other.gameObject.SendMessage("Hit", transform.up * 3);
+            if (other.gameObject.tag == "Player")
+                dashTimer = 0;
         }
     }
 

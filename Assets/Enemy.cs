@@ -14,6 +14,7 @@ public abstract class Enemy : MonoBehaviour
         knockbackLerpSpeed;
 
     public ParticleSystem deathPS,
+        deathPS2,
         sleepPS,
         triggerPS;
     public GameObject body,
@@ -89,7 +90,6 @@ public abstract class Enemy : MonoBehaviour
             }
             else if (state == "AltAttack")
             {
-                this.Log(target);
                 if (Vector3.Distance(target, transform.position) < 3)
                 {
                     currentStateTimer -= Time.fixedDeltaTime;
@@ -180,6 +180,7 @@ public abstract class Enemy : MonoBehaviour
 
     public void Hit(Vector3 kb)
     {
+        AudioManager.instance.hitSound.Play();
         knockback = kb;
         currentHP--;
         if (state == "Idle")
@@ -204,10 +205,14 @@ public abstract class Enemy : MonoBehaviour
 
     public void Death()
     {
+        ScreenShake.instance.Shake();
         CancelInvoke("AddHealth");
         healthBarScript.canvasGroup.alpha = 0;
         currentHP = 0;
+        deathPS = Instantiate(deathPS, Manager.instance.transform);
+        deathPS.transform.position = transform.position;
         deathPS.Play();
+        deathPS2.Play();
         sleepPS.Stop();
         DisableCollider();
         navMeshAgent.enabled = false;

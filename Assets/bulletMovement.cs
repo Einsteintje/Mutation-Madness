@@ -43,17 +43,24 @@ public class bulletMovement : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (color == Color.cyan || !other.gameObject.tag.In("Enemy", "Turret"))
+        if (other.gameObject.tag != "Bullet" && moveSpeed != 0)
         {
-            if (other.gameObject.tag != "Bullet" && moveSpeed != 0)
+            if (color == Player.instance.color)
+            {
+                ScreenShake.instance.Shake();
                 other.gameObject.SendMessage("Hit", transform.up);
+            }
+            else
+            {
+                if (!Manager.instance.enemies.Contains(other.gameObject.tag))
+                    other.gameObject.SendMessage("Hit", transform.up);
+            }
             Death();
         }
     }
 
     void Death()
     {
-        ScreenShake.instance.Shake();
         moveSpeed = 0;
         GetComponent<CircleCollider2D>().enabled = false;
         GetComponent<SpriteRenderer>().enabled = false;
