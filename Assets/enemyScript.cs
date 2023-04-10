@@ -11,7 +11,6 @@ public class enemyScript : Enemy
     {
         SharedStart();
         altPos = spawnPos;
-        prediction = 50;
     }
 
     public override void DisableCollider()
@@ -68,6 +67,6 @@ public class enemyScript : Enemy
             Vector3.Distance(target, transform.position) < 3
             || Vector3.Distance(transform.position, Player.instance.transform.position) > 30
         )
-            target = AIManager.instance.GetPos(pos, out pos);
+            target = AIManager.instance.GetPos(pos, out pos, distance);
     }
 }

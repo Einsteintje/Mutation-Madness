@@ -60,7 +60,7 @@ public class Dasher : Enemy
             dashTimer = maxDashTimer;
             navMeshAgent.enabled = true;
             dashing = false;
-            target = AIManager.instance.GetPos(pos, out pos);
+            target = AIManager.instance.GetPos(pos, out pos, distance);
         }
     }
 
@@ -90,7 +90,7 @@ public class Dasher : Enemy
             )
         )
         {
-            target = AIManager.instance.GetPos(pos, out pos);
+            target = AIManager.instance.GetPos(pos, out pos, distance);
         }
     }
 }

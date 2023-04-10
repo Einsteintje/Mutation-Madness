@@ -12,6 +12,7 @@ public abstract class Enemy : MonoBehaviour
         prediction;
     public float flashTime,
         knockbackLerpSpeed;
+    public string distance;
 
     public ParticleSystem deathPS,
         deathPS2,
@@ -121,13 +122,31 @@ public abstract class Enemy : MonoBehaviour
                 WakeUp();
             }
             if (started && target != navMeshAgent.destination && navMeshAgent.enabled)
+            {
+                StopCoroutine(PathChecker());
+                StartCoroutine(PathChecker());
                 navMeshAgent.SetDestination(target);
+            }
+
             knockback = new Vector3(
                 Mathf.Lerp(knockback.x, 0, knockbackLerpSpeed),
                 Mathf.Lerp(knockback.y, 0, knockbackLerpSpeed),
                 0
             );
         }
+    }
+
+    IEnumerator PathChecker()
+    {
+        yield return new WaitForSeconds(2);
+
+        if (navMeshAgent.pathPending)
+        {
+            this.Log("new path");
+            target = AIManager.instance.GetPos(pos, out pos, distance);
+        }
+        else
+            this.Log(navMeshAgent.pathPending);
     }
 
     public void SharedStart()
@@ -175,7 +194,7 @@ public abstract class Enemy : MonoBehaviour
         sleepPS.Stop();
         if (!triggerPS.isPlaying)
             triggerPS.Play();
-        target = AIManager.instance.GetPos(pos, out pos);
+        target = AIManager.instance.GetPos(pos, out pos, distance);
     }
 
     public void Hit(Vector3 kb)

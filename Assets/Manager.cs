@@ -5,11 +5,24 @@ using UnityEngine;
 public class Manager : MonoBehaviour
 {
     public static Manager instance { get; private set; }
-    public GameObject box;
-    public GameObject barrel;
-    public GameObject turret;
-    public GameObject enemy;
-    public GameObject dasher;
+
+    [SerializeField]
+    GameObject box;
+
+    [SerializeField]
+    GameObject barrel;
+
+    [SerializeField]
+    GameObject turret;
+
+    [SerializeField]
+    GameObject enemy;
+
+    [SerializeField]
+    GameObject dasher;
+
+    [SerializeField]
+    GameObject thrower;
     public Vector3 screenSize;
     public Vector3 objectSize;
     public GameObject navMesh;
@@ -33,26 +46,29 @@ public class Manager : MonoBehaviour
         { "Barrel", 1 },
         { "Enemy", 2 },
         { "Dasher", 3 },
-        { "Box", 4 }
+        { "Thrower", 4 },
+        { "Box", 5 },
     };
 
     private Dictionary<string, int> powerDict = new Dictionary<string, int>
     {
         { "Turret", 130 },
         { "Enemy", 10 },
-        { "Dasher", 40 }
+        { "Dasher", 40 },
+        { "Thrower", 50 }
     };
 
     private Dictionary<string, int> amountDict = new Dictionary<string, int>
     {
         { "Turret", 0 },
         { "Enemy", 0 },
-        { "Dasher", 0 }
+        { "Dasher", 0 },
+        { "Thrower", 0 }
     };
 
     private Dictionary<string, GameObject> enemiesDict = new Dictionary<string, GameObject>();
 
-    public List<string> enemies = new List<string> { "Turret", "Enemy", "Dasher" };
+    public List<string> enemies = new List<string> { "Turret", "Enemy", "Dasher", "Thrower" };
 
     private List<Vector2Int> objectSpots = new List<Vector2Int>();
     private List<Vector2Int> enemySpots = new List<Vector2Int>();
@@ -70,6 +86,7 @@ public class Manager : MonoBehaviour
 
         enemiesDict["Enemy"] = enemy;
         enemiesDict["Dasher"] = dasher;
+        enemiesDict["Thrower"] = thrower;
     }
 
     void Start()
@@ -113,13 +130,14 @@ public class Manager : MonoBehaviour
             objectLists[i].RemoveAll(s => s == null);
         currentWave++;
         for (int i = 0; i < AIManager.instance.spots; i++)
-            AIManager.instance.dict[i] = true;
+            foreach (string distance in AIManager.instance.distances)
+                AIManager.instance.dict[(distance, i)] = true;
         StartCoroutine(DestroyObjects());
     }
 
     void AddEnemies()
     {
-        currentPower += 40 + currentWave * 50;
+        currentPower += 50 + currentWave * 50;
         List<string> spawns = new List<string>();
 
         //get strongest enemy spawn
@@ -336,6 +354,21 @@ public class Manager : MonoBehaviour
             return true;
         else
             return false;
+    }
+
+    public Vector3 Clamp(Vector3 pos)
+    {
+        float x = Mathf.Clamp(
+            pos.x,
+            -screenSize.x + objectSize.x / 2,
+            screenSize.x - objectSize.x / 2
+        );
+        float y = Mathf.Clamp(
+            pos.y,
+            -screenSize.y + objectSize.y / 2,
+            screenSize.y - objectSize.y / 2
+        );
+        return new Vector3(x, y, 0);
     }
 
     bool Neighbours(List<List<float>> list, int x, int y)

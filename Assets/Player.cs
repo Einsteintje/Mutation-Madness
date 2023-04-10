@@ -69,18 +69,9 @@ public class Player : MonoBehaviour
             movement = input * moveSpeed * Time.fixedDeltaTime + knockback;
             transform.Translate(movement);
             //stay inside the screen
-            float x = Mathf.Clamp(
-                transform.position.x,
-                -Manager.instance.screenSize.x + Manager.instance.objectSize.x / 2,
-                Manager.instance.screenSize.x - Manager.instance.objectSize.x / 2
-            );
-            float y = Mathf.Clamp(
-                transform.position.y,
-                -Manager.instance.screenSize.y + Manager.instance.objectSize.y / 2,
-                Manager.instance.screenSize.y - Manager.instance.objectSize.y / 2
-            );
-            if (x != transform.position.x || y != transform.position.y)
-                transform.position = new Vector3(x, y, transform.position.z);
+            Vector3 clampedPos = Manager.instance.Clamp(transform.position);
+            if (clampedPos.x != transform.position.x || clampedPos.y != transform.position.y)
+                transform.position = new Vector3(clampedPos.x, clampedPos.y, transform.position.z);
         }
         else
         {

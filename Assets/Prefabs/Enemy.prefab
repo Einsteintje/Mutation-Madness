@@ -92,6 +92,7 @@ MonoBehaviour:
   prediction: 50
   flashTime: 0.05
   knockbackLerpSpeed: 0.3
+  distance: Close
   deathPS: {fileID: 3440763166009915192, guid: 4ba8cf9b9a035b440b7e901fa25e56bc, type: 3}
   deathPS2: {fileID: 1204835879649962637, guid: 4f639ca7b7cfa2d4b830b366a1eded2d, type: 3}
   sleepPS: {fileID: 7333983949855783051, guid: 7eed2823717d5bf4da1fa73bb1086144, type: 3}
