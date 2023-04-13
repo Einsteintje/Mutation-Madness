@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class Manager : MonoBehaviour
 {
@@ -16,7 +17,7 @@ public class Manager : MonoBehaviour
     GameObject turret;
 
     [SerializeField]
-    GameObject enemy;
+    GameObject shooter;
 
     [SerializeField]
     GameObject dasher;
@@ -30,52 +31,19 @@ public class Manager : MonoBehaviour
     private float scale = 0.2f;
     private float noise = 0.5f;
 
-    private int barrelAmount = 3;
-
-    private float currentOffset;
+    private float offset;
     public string state = "Idle";
 
     public int maxTimer = 30;
     public float waveTimer;
-    public int currentWave = 0;
-    public int currentPower = 0;
+    public int wave = 0;
+    public int wavePower = 0;
 
-    private Dictionary<string, int> objectDict = new Dictionary<string, int>
-    {
-        { "Turret", 0 },
-        { "Barrel", 1 },
-        { "Enemy", 2 },
-        { "Dasher", 3 },
-        { "Thrower", 4 },
-        { "Box", 5 },
-    };
-
-    private Dictionary<string, int> powerDict = new Dictionary<string, int>
-    {
-        { "Turret", 130 },
-        { "Enemy", 10 },
-        { "Dasher", 40 },
-        { "Thrower", 50 }
-    };
-
-    private Dictionary<string, int> amountDict = new Dictionary<string, int>
-    {
-        { "Turret", 0 },
-        { "Enemy", 0 },
-        { "Dasher", 0 },
-        { "Thrower", 0 }
-    };
-
-    private Dictionary<string, GameObject> enemiesDict = new Dictionary<string, GameObject>();
-
-    public List<string> enemies = new List<string> { "Turret", "Enemy", "Dasher", "Thrower" };
+    [HideInInspector]
+    public Dictionary<string, MyValue> objectDict = new Dictionary<string, MyValue>();
 
     private List<Vector2Int> objectSpots = new List<Vector2Int>();
     private List<Vector2Int> enemySpots = new List<Vector2Int>();
-
-    private List<List<GameObject>> objectLists = new List<List<GameObject>>();
-
-    // Start is called before the first frame update
 
     void Awake()
     {
@@ -84,18 +52,18 @@ public class Manager : MonoBehaviour
         else
             instance = this;
 
-        enemiesDict["Enemy"] = enemy;
-        enemiesDict["Dasher"] = dasher;
-        enemiesDict["Thrower"] = thrower;
+        objectDict["Shooter"] = new MyValue(10, 0, "Enemy", shooter, new List<GameObject>());
+        objectDict["Dasher"] = new MyValue(20, 0, "Enemy", dasher, new List<GameObject>());
+        objectDict["Thrower"] = new MyValue(30, 0, "Enemy", thrower, new List<GameObject>());
+        objectDict["Turret"] = new MyValue(100, 0, "Stationary", turret, new List<GameObject>());
+        objectDict["Barrel"] = new MyValue(0, 3, "Stationary", barrel, new List<GameObject>());
+        objectDict["Box"] = new MyValue(0, 0, "Map", box, new List<GameObject>());
     }
 
     void Start()
     {
         screenSize = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
         objectSize = barrel.transform.localScale;
-
-        for (int i = 0; i < objectDict.Count; i++)
-            objectLists.Add(new List<GameObject>());
 
         NewMap();
         waveTimer = maxTimer;
@@ -118,7 +86,7 @@ public class Manager : MonoBehaviour
 
     void NewMap()
     {
-        currentOffset = Random.Range(100, 10000);
+        offset = Random.Range(100, 10000);
         List<List<float>> list = GenerateMap();
         AddEnemies();
         StartCoroutine(LoadMap(list));
@@ -126,9 +94,9 @@ public class Manager : MonoBehaviour
 
     void ClearMap()
     {
-        for (int i = 0; i < objectLists.Count; i++)
-            objectLists[i].RemoveAll(s => s == null);
-        currentWave++;
+        foreach (MyValue value in objectDict.Values)
+            value.objects.RemoveAll(s => s == null);
+        wave++;
         for (int i = 0; i < AIManager.instance.spots; i++)
             foreach (string distance in AIManager.instance.distances)
                 AIManager.instance.dict[(distance, i)] = true;
@@ -137,57 +105,54 @@ public class Manager : MonoBehaviour
 
     void AddEnemies()
     {
-        currentPower += 50 + currentWave * 50;
-        List<string> spawns = new List<string>();
+        wavePower += 50 + wave * 50;
 
         //get strongest enemy spawn
         (string, int) strongestSpawn = ("_", 0);
-        foreach (string enemy in powerDict.Keys)
-            if (powerDict[enemy] > strongestSpawn.Item2 && powerDict[enemy] <= currentPower)
+        foreach (string key in objectDict.Keys)
+            if (objectDict[key].power > strongestSpawn.Item2 && objectDict[key].power <= wavePower)
             {
-                strongestSpawn.Item1 = enemy;
-                strongestSpawn.Item2 = powerDict[enemy];
+                strongestSpawn.Item1 = key;
+                strongestSpawn.Item2 = objectDict[key].power;
             }
-        spawns.Add(strongestSpawn.Item1);
-        currentPower -= strongestSpawn.Item2;
+        objectDict[strongestSpawn.Item1].amount++;
+        wavePower -= strongestSpawn.Item2;
 
         //get random enemies
-        while (currentPower > 0)
+        while (wavePower > 0)
         {
-            int randomIndex = Random.Range(0, enemies.Count);
-            string randomKey = enemies[randomIndex];
-            if (currentPower >= powerDict[randomKey])
+            MyValue randomValue = objectDict.Values.ElementAt(Random.Range(0, objectDict.Count));
+            if (wavePower >= randomValue.power)
             {
-                currentPower -= powerDict[randomKey];
-                spawns.Add(randomKey);
+                wavePower -= randomValue.power;
+                randomValue.amount++;
             }
         }
 
-        //add spawns to spawning list
-        for (int i = 0; i < spawns.Count; i++)
-            amountDict[spawns[i]]++;
-
         //add any leftover enemies from last wave
-        List<string> keyList = new List<string>(amountDict.Keys);
-        foreach (string enemy in keyList)
-            amountDict[enemy] += objectLists[objectDict[enemy]].Count;
-        for (int i = 0; i < objectLists.Count; i++)
-            objectLists[i].Clear();
+        foreach (MyValue value in objectDict.Values)
+        {
+            value.amount += value.objects.Count;
+            value.objects.Clear();
+        }
+
+        //respawn barrels
+        objectDict["Barrel"].amount = Random.Range(3, 5);
     }
 
     IEnumerator DestroyObjects()
     {
         WaitForSeconds wait = new WaitForSeconds(0.003f);
         WaitForSeconds shorterWait = new WaitForSeconds(0.001f);
-        foreach (List<GameObject> objectList in objectLists)
-            for (int i = 0; i < objectList.Count; i++)
+        foreach (MyValue value in objectDict.Values)
+            for (int i = 0; i < value.objects.Count; i++)
             {
-                if (objectList[i] == null)
+                if (value.objects[i] == null)
                     continue;
-                objectList[i].SendMessage("Death");
+                value.objects[i].SendMessage("Death");
                 yield return wait;
             }
-        yield return wait;
+
         ParticleSystem[] psList = GetComponentsInChildren<ParticleSystem>();
         for (int i = 0; i < psList.Length; i++)
         {
@@ -222,58 +187,54 @@ public class Manager : MonoBehaviour
                     (y + 0.5f) * objectSize.y - screenSize.y,
                     0
                 );
-                if (list[y][x] > noise)
+                if (Mathf.Abs(middle.x - x) > 4 || Mathf.Abs(middle.y - y) > 4)
                 {
-                    if (Mathf.Abs(middle.x - x) > 1 && Mathf.Abs(middle.y - y) > 1)
+                    if (list[y][x] > noise)
                     {
                         GameObject spawned = Instantiate(box, pos, box.transform.rotation);
-                        objectLists[objectDict[spawned.tag]].Add(spawned);
                         spawned.transform.parent = navMesh.transform;
+                        objectDict[spawned.tag].objects.Add(spawned);
                         yield return wait;
                     }
+                    else if (!Neighbours(list, x, y))
+                        objectSpots.Add(new Vector2Int(x, y));
+                    else
+                        enemySpots.Add(new Vector2Int(x, y));
                 }
-                else if (!Neighbours(list, x, y))
-                    objectSpots.Add(new Vector2Int(x, y));
-                else
-                    enemySpots.Add(new Vector2Int(x, y));
             }
 
         //enemies
         enemySpots.Shuffle();
-        foreach (string enemyName in enemiesDict.Keys)
-        {
-            for (int i = amountDict[enemyName]; i > 0; i--)
-            {
-                Vector3 pos = new Vector3(
-                    (enemySpots[i].x + 0.5f) * objectSize.x - screenSize.x,
-                    (enemySpots[i].y + 0.5f) * objectSize.y - screenSize.y,
-                    0
-                );
-                GameObject spawned = Instantiate(
-                    enemiesDict[enemyName],
-                    pos,
-                    enemiesDict[enemyName].transform.rotation
-                );
-                enemySpots.RemoveAt(i);
-                amountDict[enemyName]--;
-                objectLists[objectDict[spawned.tag]].Add(spawned);
-                yield return wait;
-            }
-        }
+        foreach (MyValue value in objectDict.Values)
+            if (value.group == "Enemy")
+                for (int i = value.amount; i > 0; i--)
+                {
+                    Vector3 pos = new Vector3(
+                        (enemySpots[i].x + 0.5f) * objectSize.x - screenSize.x,
+                        (enemySpots[i].y + 0.5f) * objectSize.y - screenSize.y,
+                        0
+                    );
+                    GameObject spawned = Instantiate(value.obj, pos, value.obj.transform.rotation);
+                    enemySpots.RemoveAt(i);
+                    value.amount--;
+                    value.objects.Add(spawned);
+                    yield return wait;
+                }
 
+        //objects
         List<Vector2Int> spots = new List<Vector2Int>();
-        List<int> randomNums = GenerateRandom(
-            barrelAmount + amountDict["Turret"],
-            0,
-            objectSpots.Count
-        );
+        int stationaryAmount = 0;
+        foreach (MyValue value in objectDict.Values)
+            if (value.group == "Stationary")
+                stationaryAmount += value.amount;
+        List<int> randomNums = GenerateRandom(stationaryAmount, 0, objectSpots.Count);
         foreach (int num in randomNums)
         {
             int crashFix = 0;
-            int test = num;
-            while (Neighbours2(spots, objectSpots[test]))
+            int numToTest = num;
+            while (Neighbours2(spots, objectSpots[numToTest]))
             {
-                test = Random.Range(0, objectSpots.Count);
+                numToTest = Random.Range(0, objectSpots.Count);
                 crashFix += 1;
                 if (crashFix > 100)
                 {
@@ -281,31 +242,26 @@ public class Manager : MonoBehaviour
                     break;
                 }
             }
-            spots.Add(objectSpots[test]);
+            spots.Add(objectSpots[numToTest]);
         }
 
-        //objects
-        for (int i = 0; i < spots.Count; i++)
-        {
-            GameObject spawned;
-            Vector3 pos = new Vector3(
-                (spots[i].x + 0.5f) * objectSize.x - screenSize.x,
-                (spots[i].y + 0.5f) * objectSize.y - screenSize.y,
-                0
-            );
-            if (i < amountDict["Turret"])
-            {
-                spawned = Instantiate(turret, pos, turret.transform.rotation);
-                spawned.transform.parent = navMesh.transform;
-            }
-            else
-                spawned = Instantiate(barrel, pos, barrel.transform.rotation);
-            spawned.transform.parent = navMesh.transform;
-            objectLists[objectDict[spawned.tag]].Add(spawned);
-            yield return wait;
-        }
-
-        yield return wait;
+        int index = -1;
+        foreach (MyValue value in objectDict.Values)
+            if (value.group == "Stationary")
+                while (value.amount > 0)
+                {
+                    index += 1;
+                    Vector3 pos = new Vector3(
+                        (spots[index].x + 0.5f) * objectSize.x - screenSize.x,
+                        (spots[index].y + 0.5f) * objectSize.y - screenSize.y,
+                        0
+                    );
+                    GameObject spawned = Instantiate(value.obj, pos, value.obj.transform.rotation);
+                    spawned.transform.parent = navMesh.transform;
+                    value.amount--;
+                    value.objects.Add(spawned);
+                    yield return wait;
+                }
         state = "Idle";
     }
 
@@ -318,7 +274,7 @@ public class Manager : MonoBehaviour
             list.Add(new List<float>());
             for (int x = 0; x < screenSize.x / 2; x++)
             {
-                list[y].Add(Mathf.PerlinNoise(x * scale + currentOffset, y * scale + 30));
+                list[y].Add(Mathf.PerlinNoise(x * scale + offset, y * scale + 30));
             }
         }
         return list;
@@ -393,5 +349,23 @@ public class Manager : MonoBehaviour
                 if (list.Contains(new Vector2Int(pos.x + i, pos.y + j)))
                     return true;
         return false;
+    }
+}
+
+public class MyValue
+{
+    public int power;
+    public int amount;
+    public string group;
+    public GameObject obj;
+    public List<GameObject> objects;
+
+    public MyValue(int Power, int Amount, string Group, GameObject Obj, List<GameObject> Objects)
+    {
+        power = Power;
+        amount = Amount;
+        group = Group;
+        obj = Obj;
+        objects = Objects;
     }
 }

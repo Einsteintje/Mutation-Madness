@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class enemyScript : Enemy
+public class Shooter : Enemy
 {
     public GameObject bullet;
     RaycastHit2D hit;
@@ -23,7 +23,7 @@ public class enemyScript : Enemy
         SharedUpdate();
     }
 
-    public override void Attack(bool overwrite = false)
+    public override void Attack(bool alternate = false)
     {
         Vector3 offset = new Vector3(
             Player.instance.transform.position.x - transform.position.x,
@@ -34,25 +34,26 @@ public class enemyScript : Enemy
         hit = Physics2D.Linecast(transform.position + offset, Player.instance.transform.position);
         if (hit)
         {
-            if (!hit.collider.gameObject.tag.In("Box", "Barrel") || overwrite)
+            if (!hit.collider.gameObject.tag.In("Box", "Barrel") || alternate)
             {
-                currentCD -= Time.fixedDeltaTime;
-                if (currentCD <= 0)
+                cD -= Time.fixedDeltaTime;
+                if (cD <= 0)
                 {
                     GameObject spawned = Instantiate(
                         bullet,
                         transform.position + offset,
                         Quaternion.Euler(new Vector3(0, 0, Angle()))
                     );
-                    bulletMovement script = spawned.GetComponent<bulletMovement>();
+                    Bullet script = spawned.GetComponent<Bullet>();
                     script.moveSpeed = attackSpeed;
                     script.size = 2f;
                     script.color = Color.red;
-                    currentCD = maxCD;
+                    script.mutation = mutation;
+                    cD = maxCD;
                 }
             }
             else
-                currentCD = maxCD;
+                cD = maxCD;
         }
     }
 

@@ -21,16 +21,21 @@ public class weaponScript : MonoBehaviour
     {
         if (Input.GetMouseButton(0) && currentCD <= 0 && ammo > 0)
         {
-            Vector3 spawnPos = transform.position + Quaternion.Euler(0, 0, -90) * transform.up * 4f;
+            ScreenShake.instance.Shake();
+            Vector3 spawnPos = transform.position + Quaternion.Euler(0, 0, 0) * transform.up * 4f;
             muzzleFlash.transform.position = spawnPos;
             muzzleFlash.Play();
             AudioManager.instance.shootSound.Play();
 
-            GameObject spawned = Instantiate(bullet, spawnPos, transform.rotation);
+            GameObject spawned = Instantiate(
+                bullet,
+                spawnPos,
+                transform.rotation * Quaternion.Euler(0, 0, 90)
+            );
             BulletStats(spawned);
             currentCD = maxCD;
             ammo--;
-            recoil = Quaternion.Euler(0, 0, -90) * transform.up * kickback;
+            recoil = Quaternion.Euler(0, 0, 0) * transform.up * kickback;
         }
         else
         {
@@ -48,9 +53,9 @@ public class weaponScript : MonoBehaviour
 
     void BulletStats(GameObject spawned)
     {
-        bulletMovement script = spawned.GetComponent<bulletMovement>();
+        Bullet script = spawned.GetComponent<Bullet>();
         script.moveSpeed = 100;
         script.size = 2f;
-        script.color = Color.cyan;
+        script.color = Player.instance.color;
     }
 }

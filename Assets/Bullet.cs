@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
-public class bulletMovement : MonoBehaviour
+public class Bullet : MonoBehaviour
 {
     public float moveSpeed;
     public float size;
     public Color color;
+    public string mutation;
     private ParticleSystem ps;
 
     void Awake()
@@ -48,13 +50,16 @@ public class bulletMovement : MonoBehaviour
             if (color == Player.instance.color)
             {
                 ScreenShake.instance.Shake();
-                other.gameObject.SendMessage("Hit", transform.up);
+                Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 30);
+                foreach (Collider2D collider in colliders)
+                {
+                    Enemy script = collider.gameObject.GetComponent<Enemy>();
+                    if (script != null)
+                        if (script.state == "Idle")
+                            script.WakeUp();
+                }
             }
-            else
-            {
-                if (!Manager.instance.enemies.Contains(other.gameObject.tag))
-                    other.gameObject.SendMessage("Hit", transform.up);
-            }
+            other.gameObject.SendMessage("Hit", (transform.up, mutation));
             Death();
         }
     }
@@ -68,4 +73,6 @@ public class bulletMovement : MonoBehaviour
         ps.Play();
         Destroy(gameObject, 2f);
     }
+
+    void Hit() { }
 }

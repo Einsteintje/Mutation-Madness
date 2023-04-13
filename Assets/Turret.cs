@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class turretScript : MonoBehaviour
+public class Turret : MonoBehaviour
 {
     public float maxCD = 0.5f;
     public float currentCD;
@@ -12,6 +12,14 @@ public class turretScript : MonoBehaviour
     public float hp;
     ParticleSystem ps;
     SpriteRenderer spriteRenderer;
+
+    [HideInInspector]
+    public Dictionary<string, float> mutationEffects = new Dictionary<string, float>
+    {
+        { "Ice", 0.0f },
+        { "Fire", 0.0f },
+        { "Electric", 0.0f }
+    };
 
     // Start is called before the first frame update
     void Start()
@@ -47,7 +55,7 @@ public class turretScript : MonoBehaviour
                             transform.position + offset,
                             Quaternion.Euler(new Vector3(0, 0, Angle()))
                         );
-                        bulletMovement script = spawned.GetComponent<bulletMovement>();
+                        Bullet script = spawned.GetComponent<Bullet>();
                         script.moveSpeed = bulletSpeed;
                         script.size = 2f;
                         script.color = Color.red;
@@ -72,8 +80,9 @@ public class turretScript : MonoBehaviour
         return Mathf.Atan2(y + yPrediction, x + xPrediction) * Mathf.Rad2Deg;
     }
 
-    void Hit()
+    public void Hit((Vector3, string) tuple)
     {
+        mutationEffects[tuple.Item2] = 1.0f;
         hp--;
         if (hp > 0)
             ps.Play();

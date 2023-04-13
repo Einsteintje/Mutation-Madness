@@ -7,16 +7,9 @@ public class navMeshScript : MonoBehaviour
 {
     public NavMeshSurface2d surface;
 
-    // Start is called before the first frame update
     void Start()
     {
-        InvokeRepeating("UpdateMesh", 0.0f, 0.1f);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        //UpdateMesh();
+        InvokeRepeating("UpdateMesh", 0.0f, 0.5f);
     }
 
     public void UpdateMesh()

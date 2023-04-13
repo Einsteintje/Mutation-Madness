@@ -12,6 +12,7 @@ TagManager:
   - Enemy
   - Dasher
   - Thrower
+  - Shooter
   layers:
   - Default
   - TransparentFX

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class Dasher : Enemy
 {
@@ -31,19 +32,19 @@ public class Dasher : Enemy
         SharedUpdate();
     }
 
-    public override void Attack(bool overwrite = false)
+    public override void Attack(bool alternate = false)
     {
         if (!dashing)
         {
             body.transform.rotation = Quaternion.Euler(new Vector3(0, 0, Angle() - 90));
         }
-        if (currentCD > 0)
+        if (cD > 0)
         {
-            currentCD -= Time.fixedDeltaTime;
+            cD -= Time.fixedDeltaTime;
         }
-        if (Vector3.Distance(transform.position, target) < 3 && currentCD <= 0)
+        if (Vector3.Distance(transform.position, target) < 3 && cD <= 0)
         {
-            currentCD = maxCD;
+            cD = maxCD;
             dashing = true;
             navMeshAgent.enabled = false;
             transform.rotation = Quaternion.Euler(new Vector3(0, 0, Angle() - 90));
@@ -66,13 +67,9 @@ public class Dasher : Enemy
 
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (
-            dashing
-            && other.gameObject.tag != "Bullet"
-            && !Manager.instance.enemies.Contains(other.gameObject.tag)
-        )
+        if (dashing && other.gameObject.tag != "Bullet")
         {
-            other.gameObject.SendMessage("Hit", transform.up * 3);
+            other.gameObject.SendMessage("Hit", (transform.up * 3, mutation));
             if (other.gameObject.tag == "Player")
                 dashTimer = 0;
         }

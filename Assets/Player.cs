@@ -27,6 +27,14 @@ public class Player : MonoBehaviour
     Volume volume;
     Vignette vignette;
 
+    [HideInInspector]
+    public Dictionary<string, float> mutationEffects = new Dictionary<string, float>
+    {
+        { "Ice", 0.0f },
+        { "Fire", 0.0f },
+        { "Electric", 0.0f }
+    };
+
     void Awake()
     {
         if (instance != null && instance != this)
@@ -86,13 +94,11 @@ public class Player : MonoBehaviour
         }
     }
 
-    void Hit(Vector3 kb)
+    public void Hit((Vector3, string) tuple)
     {
-        knockback = kb;
-        ParticleSystem ps = Instantiate(hitPS, Manager.instance.transform);
-        ps.transform.rotation = Quaternion.Euler(kb);
-        ps.transform.position = transform.position;
-        ps.Play();
+        mutationEffects[tuple.Item2] = 1.0f;
+        knockback = tuple.Item1;
+        HitPS(tuple.Item1);
         Flash();
     }
 
@@ -107,5 +113,18 @@ public class Player : MonoBehaviour
     {
         foreach (SpriteRenderer renderer in renderers)
             renderer.color = color;
+    }
+
+    public void HitPS(Vector3 kb)
+    {
+        ParticleSystem ps = Instantiate(hitPS, Manager.instance.transform);
+        var subEmitter = ps.subEmitters.GetSubEmitterSystem(0);
+        var main = ps.main;
+        main.startColor = color;
+        main = subEmitter.main;
+        main.startColor = color;
+        ps.transform.rotation = Quaternion.Euler(kb);
+        ps.transform.position = transform.position;
+        ps.Play();
     }
 }

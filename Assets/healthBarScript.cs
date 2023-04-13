@@ -8,17 +8,17 @@ public class healthBarScript : MonoBehaviour
     public Slider slider;
     public CanvasGroup canvasGroup;
     private int oldHP;
-    public float currentHP;
+    public float hP;
 
-    public void UpdateSlider(int hp, int maxHP)
+    public void UpdateSlider(int newHP, int maxHP)
     {
-        currentHP = Mathf.Lerp(currentHP, hp, 0.2f);
-        if (Mathf.Abs(currentHP - hp) < 0.1)
+        hP = Mathf.Lerp(hP, newHP, 0.2f);
+        if (Mathf.Abs(hP - newHP) < 0.1)
         {
-            oldHP = hp;
-            currentHP = hp;
+            oldHP = newHP;
+            hP = newHP;
         }
-        slider.value = currentHP / maxHP;
+        slider.value = hP / maxHP;
     }
 
     public void FadeIn()

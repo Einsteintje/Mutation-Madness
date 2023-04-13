@@ -22,6 +22,6 @@ public class uiScript : MonoBehaviour
         else
             tmpList[0].text = "0,0";
 
-        tmpList[1].text = Manager.instance.currentWave.ToString();
+        tmpList[1].text = Manager.instance.wave.ToString();
     }
 }

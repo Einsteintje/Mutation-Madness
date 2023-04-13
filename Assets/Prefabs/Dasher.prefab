@@ -109,6 +109,7 @@ MonoBehaviour:
   maxHP: 4
   maxHealthTimer: 2
   maxStateTimer: 5
+  maxPathFixTimer: 2
   maxCD: 1
   attackSpeed: 80
   prediction: 50
@@ -119,6 +120,7 @@ MonoBehaviour:
   deathPS2: {fileID: 1204835879649962637, guid: 4f639ca7b7cfa2d4b830b366a1eded2d, type: 3}
   sleepPS: {fileID: 7333983949855783051, guid: 7eed2823717d5bf4da1fa73bb1086144, type: 3}
   triggerPS: {fileID: 7853014620431436436, guid: 4119e912f5e285448a4dc61af63a6d76, type: 3}
+  hitPS: {fileID: 8827349871731721454, guid: 5089a90edcd86134eae492240bb551eb, type: 3}
   body: {fileID: 6622777831382838351, guid: 491f3cc5e6e05044ba8510fec98a3249, type: 3}
   healthBar: {fileID: 968103364133973092, guid: d8bd2710f281aa54ea02b06c49ce4168, type: 3}
   navMeshAgent: {fileID: 1326922111835198609}
@@ -127,13 +129,14 @@ MonoBehaviour:
   currentStateTimer: 0
   currentCD: 0
   currentHealthTimer: 0
+  pathFixTimer: 0
   currentHP: 0
   knockback: {x: 0, y: 0, z: 0}
   target: {x: 0, y: 0, z: 0}
   spawnPos: {x: 0, y: 0, z: 0}
   altPos: {x: 0, y: 0, z: 0}
   spriteRenderer: {fileID: 0}
-  origionalColor: {r: 0, g: 0, b: 0, a: 0}
+  color: {r: 0, g: 0, b: 0, a: 0}
   healthBarScript: {fileID: 0}
   pos: -1
   maxDashTimer: 0.3
