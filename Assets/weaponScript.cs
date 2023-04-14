@@ -30,7 +30,12 @@ public class weaponScript : MonoBehaviour
             GameObject spawned = Instantiate(
                 bullet,
                 spawnPos,
-                transform.rotation * Quaternion.Euler(0, 0, 90)
+                transform.rotation
+                    * Quaternion.Euler(
+                        0,
+                        0,
+                        90 + Mathf.Pow(Player.instance.charged, 10) * Random.Range(-1f, 1f)
+                    )
             );
             BulletStats(spawned);
             currentCD = maxCD;
@@ -47,7 +52,7 @@ public class weaponScript : MonoBehaviour
         }
         if (currentCD > 0)
         {
-            currentCD -= Time.fixedDeltaTime;
+            currentCD -= Time.fixedDeltaTime * Player.instance.charged;
         }
     }
 

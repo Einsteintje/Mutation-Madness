@@ -88,7 +88,7 @@ NavMeshAgent:
   m_AngularSpeed: 120
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 1
   m_BaseOffset: 0.5
@@ -126,11 +126,12 @@ MonoBehaviour:
   navMeshAgent: {fileID: 1326922111835198609}
   state: Idle
   started: 0
-  currentStateTimer: 0
-  currentCD: 0
-  currentHealthTimer: 0
+  stateTimer: 0
+  cD: 0
+  healthTimer: 0
   pathFixTimer: 0
-  currentHP: 0
+  hP: 0
+  falsePathCounter: 0
   knockback: {x: 0, y: 0, z: 0}
   target: {x: 0, y: 0, z: 0}
   spawnPos: {x: 0, y: 0, z: 0}
@@ -139,4 +140,5 @@ MonoBehaviour:
   color: {r: 0, g: 0, b: 0, a: 0}
   healthBarScript: {fileID: 0}
   pos: -1
+  mutation: 
   maxDashTimer: 0.3

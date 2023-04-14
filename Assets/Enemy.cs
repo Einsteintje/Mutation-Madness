@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public abstract class Enemy : MonoBehaviour
@@ -62,17 +63,6 @@ public abstract class Enemy : MonoBehaviour
 
     [HideInInspector]
     public string mutation;
-
-    [HideInInspector]
-    public string[] mutations = { "Fire", "Ice", "Electric" };
-
-    [HideInInspector]
-    public Dictionary<string, Color> mutationColors = new Dictionary<string, Color>
-    {
-        { "Fire", Color.red },
-        { "Ice", Color.cyan },
-        { "Electric", Color.yellow }
-    };
 
     [HideInInspector]
     public Dictionary<string, float> mutationEffects = new Dictionary<string, float>
@@ -181,8 +171,10 @@ public abstract class Enemy : MonoBehaviour
         healthBarScript = healthBar.GetComponent<healthBarScript>();
         spriteRenderer = body.GetComponent<SpriteRenderer>();
 
-        mutation = mutations[Random.Range(0, mutations.Length)];
-        color = mutationColors[mutation];
+        mutation = MutationManager.instance.mutations.Keys.ElementAt(
+            Random.Range(0, MutationManager.instance.mutations.Keys.Count)
+        );
+        color = MutationManager.instance.mutations[mutation].color;
         spriteRenderer.color = color;
 
         stateTimer = maxStateTimer;
@@ -198,12 +190,14 @@ public abstract class Enemy : MonoBehaviour
         sleepPS = Instantiate(
             sleepPS,
             transform.position + Vector3.up * 2,
-            Quaternion.Euler(-90, 0, 0)
+            Quaternion.Euler(-90, 0, 0),
+            transform
         );
         triggerPS = Instantiate(
             triggerPS,
             transform.position + Vector3.up * 2,
-            Quaternion.Euler(-90, 0, 0)
+            Quaternion.Euler(-90, 0, 0),
+            transform
         );
     }
 
@@ -256,9 +250,10 @@ public abstract class Enemy : MonoBehaviour
     {
         ScreenShake.instance.Shake();
         CancelInvoke("AddHealth");
+        CancelInvoke("ResetColor");
         healthBarScript.canvasGroup.alpha = 0;
         hP = 0;
-        deathPS = Instantiate(deathPS, Manager.instance.transform);
+        deathPS = Instantiate(deathPS, Manager.instance.transform, transform);
         SetPSColor(deathPS);
         deathPS.transform.position = transform.position;
         deathPS.Play();

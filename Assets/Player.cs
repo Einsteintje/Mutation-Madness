@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using System.Linq;
 
 public class Player : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class Player : MonoBehaviour
     public ParticleSystem hitPS;
     public CircleCollider2D col;
     Vector3 knockback = new Vector3();
+    Vector3 input = new Vector3();
     float flashTime = 0.05f;
 
     [HideInInspector]
@@ -34,6 +36,21 @@ public class Player : MonoBehaviour
         { "Fire", 0.0f },
         { "Electric", 0.0f }
     };
+    Dictionary<string, ParticleSystem> mutationPS = new Dictionary<string, ParticleSystem>();
+
+    [HideInInspector]
+    public float slipperyness = 1f;
+
+    [HideInInspector]
+    public float fireSpeed = 1f;
+
+    [HideInInspector]
+    public float fireTimer = 0f;
+
+    [HideInInspector]
+    public float charged = 1f;
+
+    public float hP;
 
     void Awake()
     {
@@ -71,11 +88,21 @@ public class Player : MonoBehaviour
             col.enabled = true;
             weapon.enabled = true;
             //movement
-            Vector3 input = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
+            input = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
             input = Vector3.ClampMagnitude(input, 1);
             input -= weapon.recoil;
-            movement = input * moveSpeed * Time.fixedDeltaTime + knockback;
+            movement = Vector3.Lerp(
+                movement,
+                input
+                    * moveSpeed
+                    / Mathf.Pow(slipperyness, 1f / 10f)
+                    * fireSpeed
+                    * Time.fixedDeltaTime
+                    + knockback,
+                slipperyness
+            );
             transform.Translate(movement);
+
             //stay inside the screen
             Vector3 clampedPos = Manager.instance.Clamp(transform.position);
             if (clampedPos.x != transform.position.x || clampedPos.y != transform.position.y)
@@ -92,6 +119,7 @@ public class Player : MonoBehaviour
             weapon.enabled = false;
             weapon.recoil = new Vector3(0, 0, 0);
         }
+        MutationHandler();
     }
 
     public void Hit((Vector3, string) tuple)
@@ -126,5 +154,32 @@ public class Player : MonoBehaviour
         ps.transform.rotation = Quaternion.Euler(kb);
         ps.transform.position = transform.position;
         ps.Play();
+    }
+
+    void MutationHandler()
+    {
+        foreach (string mutation in MutationManager.instance.mutations.Keys)
+        {
+            if (mutationEffects[mutation] > 0)
+            {
+                if (!mutationPS.Keys.Contains(mutation))
+                    mutationPS[mutation] = Instantiate(
+                        MutationManager.instance.mutations[mutation].ps,
+                        transform
+                    );
+                if (!mutationPS[mutation].isPlaying)
+                    mutationPS[mutation].Play();
+                MutationManager.instance.mutations[mutation].action(this.gameObject);
+            }
+            else if (mutationPS.Keys.Contains(mutation))
+            {
+                if (mutationPS[mutation].isPlaying)
+                    mutationPS[mutation].Stop();
+                slipperyness = 1f;
+                fireSpeed = 1f;
+                fireTimer = 0f;
+                charged = 1.0f;
+            }
+        }
     }
 }

@@ -45,6 +45,7 @@ public class Shell : MonoBehaviour
         {
             if (!psList[0].isPlaying)
             {
+                ScreenShake.instance.Shake();
                 GetComponent<SpriteRenderer>().enabled = false;
                 circleRenderer.enabled = false;
                 Destroy(circle, 1f);

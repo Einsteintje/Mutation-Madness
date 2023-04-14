@@ -63,7 +63,7 @@ public class Manager : MonoBehaviour
     void Start()
     {
         screenSize = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
-        objectSize = barrel.transform.localScale;
+        objectSize = turret.transform.localScale;
 
         NewMap();
         waveTimer = maxTimer;
@@ -166,7 +166,7 @@ public class Manager : MonoBehaviour
             }
             psList[i].SetParticles(particles, numParticles);
             Destroy(psList[i], 1);
-            yield return shorterWait;
+            //yield return shorterWait;
         }
         state = "Generating";
         objectSpots.Clear();
@@ -191,6 +191,7 @@ public class Manager : MonoBehaviour
                 {
                     if (list[y][x] > noise)
                     {
+                        this.Log(pos);
                         GameObject spawned = Instantiate(box, pos, box.transform.rotation);
                         spawned.transform.parent = navMesh.transform;
                         objectDict[spawned.tag].objects.Add(spawned);
