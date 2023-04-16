@@ -41,6 +41,8 @@ public class explosionScript : MonoBehaviour
     {
         if (GetComponent<SpriteRenderer>() != null)
         {
+            if (Manager.instance.state == "Idle")
+                Player.instance.score += 20;
             Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, explosionRange);
             foreach (Collider2D collider in colliders)
                 if (collider.gameObject.tag != "Barrel")

@@ -82,7 +82,8 @@ public class Player : MonoBehaviour
         healthBar = Instantiate(healthBar);
         healthBarScript = healthBar.GetComponent<healthBarScript>();
 
-        maxHP = (int)(maxHP * ShopManager.instance.upgrades["Health"].boost);
+        if (ShopManager.instance != null)
+            maxHP = (int)(maxHP * ShopManager.instance.upgrades["Health"].boost);
 
         hP = maxHP;
         healthBar.transform.position = transform.position + Vector3.up * 3;
@@ -111,17 +112,29 @@ public class Player : MonoBehaviour
             input = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
             input = Vector3.ClampMagnitude(input, 1);
             input -= weapon.recoil;
-            movement = Vector3.Lerp(
-                movement,
-                input
-                    * moveSpeed
-                    * ShopManager.instance.upgrades["Speed"].boost
-                    / Mathf.Pow(slipperyness, 1f / 10f)
-                    * fireSpeed
-                    * Time.fixedDeltaTime
-                    + knockback,
-                slipperyness
-            );
+            if (ShopManager.instance != null)
+                movement = Vector3.Lerp(
+                    movement,
+                    input
+                        * moveSpeed
+                        * ShopManager.instance.upgrades["Speed"].boost
+                        / Mathf.Pow(slipperyness, 1f / 10f)
+                        * fireSpeed
+                        * Time.fixedDeltaTime
+                        + knockback,
+                    slipperyness
+                );
+            else
+                movement = Vector3.Lerp(
+                    movement,
+                    input
+                        * moveSpeed
+                        / Mathf.Pow(slipperyness, 1f / 10f)
+                        * fireSpeed
+                        * Time.fixedDeltaTime
+                        + knockback,
+                    slipperyness
+                );
             transform.Translate(movement);
 
             //stay inside the screen
@@ -167,9 +180,18 @@ public class Player : MonoBehaviour
         }
         else
         {
-            ShopManager.instance.canvas.SetActive(true);
-            ShopManager.instance.currency += score;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+            if (ShopManager.instance != null)
+            {
+                ShopManager.instance.Invoke("Start", 0.1f);
+                //foreach (GameObject barrel in ShopManager.instance.barrels)
+                //barrel.SetActive(true);
+                //ShopManager.instance.canvas.SetActive(true);
+                //ShopManager.instance.volume.SetActive(true);
+                ShopManager.instance.currency += score;
+                //ShopManager.instance.currencyText.text =
+                //$"Currency = {ShopManager.instance.currency.ToString()}";
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+            }
         }
     }
 

@@ -272,7 +272,7 @@ GameObject:
   - component: {fileID: 82486396}
   m_Layer: 5
   m_Name: Shield
-  m_TagString: Untagged
+  m_TagString: Shield
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -540,7 +540,7 @@ GameObject:
   - component: {fileID: 371008104}
   m_Layer: 5
   m_Name: Currency
-  m_TagString: Untagged
+  m_TagString: Currency
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -676,7 +676,7 @@ GameObject:
   - component: {fileID: 550360703}
   m_Layer: 5
   m_Name: Reload
-  m_TagString: Untagged
+  m_TagString: Reload
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -993,7 +993,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7939106148393196164, guid: 199938bc16003964a9ddbaa2dc2e2c64, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7939106148393196164, guid: 199938bc16003964a9ddbaa2dc2e2c64, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1288,13 +1288,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2429791cc03c57340b83ac410b1c3faf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currency: 0
-  health: {fileID: 1778526062}
-  shield: {fileID: 82486394}
-  speed: {fileID: 1363773116}
-  reload: {fileID: 550360701}
-  canvas: {fileID: 830944040}
-  currencyText: {fileID: 371008104}
+  currency: 150
+  currencyObj: {fileID: 371008102}
 --- !u!4 &802678227
 Transform:
   m_ObjectHideFlags: 0
@@ -1308,7 +1303,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &830944040
 GameObject:
@@ -1415,7 +1410,7 @@ RectTransform:
   - {fileID: 371008103}
   - {fileID: 1930104629}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2075,7 +2070,7 @@ GameObject:
   - component: {fileID: 1363773118}
   m_Layer: 5
   m_Name: Speed
-  m_TagString: Untagged
+  m_TagString: Speed
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2261,7 +2256,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1475066677
 GameObject:
@@ -2277,7 +2272,7 @@ GameObject:
   - component: {fileID: 1475066679}
   m_Layer: 5
   m_Name: Play
-  m_TagString: Untagged
+  m_TagString: Play
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2681,7 +2676,7 @@ GameObject:
   - component: {fileID: 1778526064}
   m_Layer: 5
   m_Name: Health
-  m_TagString: Untagged
+  m_TagString: Health
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2842,13 +2837,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1811485136}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.5554715, y: -0.2235436, z: -0.076429345}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.5554714, y: -0.22354364, z: -0.076429345}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1815419872
 PrefabInstance:
@@ -2875,7 +2870,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7939106148393196164, guid: 199938bc16003964a9ddbaa2dc2e2c64, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 7939106148393196164, guid: 199938bc16003964a9ddbaa2dc2e2c64, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2965,11 +2960,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7939106148393196164, guid: 199938bc16003964a9ddbaa2dc2e2c64, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7939106148393196164, guid: 199938bc16003964a9ddbaa2dc2e2c64, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6.56
+      value: 6.5600004
       objectReference: {fileID: 0}
     - target: {fileID: 7939106148393196164, guid: 199938bc16003964a9ddbaa2dc2e2c64, type: 3}
       propertyPath: m_LocalPosition.y

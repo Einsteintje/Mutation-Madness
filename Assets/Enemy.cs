@@ -256,7 +256,8 @@ public abstract class Enemy : MonoBehaviour
 
     public void Death()
     {
-        Player.instance.score += 100;
+        if (Manager.instance.state == "Idle")
+            Player.instance.score += 100;
         ScreenShake.instance.Shake();
         CancelInvoke("AddHealth");
         CancelInvoke("ResetColor");

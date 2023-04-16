@@ -28,6 +28,8 @@ public class boxScript : MonoBehaviour
         InvokeRepeating("Lights", 0.0f, 0.02f);
         light2d = GetComponentInChildren<UnityEngine.Rendering.Universal.Light2D>();
         light2d.intensity = 5.0f;
+        if (Manager.instance.state == "Idle")
+            Player.instance.score += 10;
         Destroy(gameObject, 2f);
     }
 

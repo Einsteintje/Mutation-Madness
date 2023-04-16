@@ -52,10 +52,13 @@ public class weaponScript : MonoBehaviour
         }
         if (currentCD > 0)
         {
-            currentCD -=
-                Time.fixedDeltaTime
-                * Player.instance.charged
-                * ShopManager.instance.upgrades["Reload"].boost;
+            if (ShopManager.instance != null)
+                currentCD -=
+                    Time.fixedDeltaTime
+                    * Player.instance.charged
+                    * ShopManager.instance.upgrades["Reload"].boost;
+            else
+                currentCD -= Time.fixedDeltaTime * Player.instance.charged;
         }
     }
 

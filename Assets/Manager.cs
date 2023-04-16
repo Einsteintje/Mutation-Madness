@@ -52,10 +52,10 @@ public class Manager : MonoBehaviour
         else
             instance = this;
 
-        objectDict["Shooter"] = new MyValue(10, 0, "Enemy", shooter, new List<GameObject>());
-        objectDict["Dasher"] = new MyValue(20, 0, "Enemy", dasher, new List<GameObject>());
+        objectDict["Shooter"] = new MyValue(20, 0, "Enemy", shooter, new List<GameObject>());
+        objectDict["Dasher"] = new MyValue(10, 0, "Enemy", dasher, new List<GameObject>());
         objectDict["Thrower"] = new MyValue(30, 0, "Enemy", thrower, new List<GameObject>());
-        objectDict["Turret"] = new MyValue(100, 0, "Stationary", turret, new List<GameObject>());
+        objectDict["Turret"] = new MyValue(40, 0, "Stationary", turret, new List<GameObject>());
         objectDict["Barrel"] = new MyValue(0, 3, "Stationary", barrel, new List<GameObject>());
         objectDict["Box"] = new MyValue(0, 0, "Map", box, new List<GameObject>());
     }
@@ -74,7 +74,22 @@ public class Manager : MonoBehaviour
     void FixedUpdate()
     {
         if (state == "Idle")
+        {
             waveTimer -= Time.fixedDeltaTime;
+            int test = 0;
+            foreach (MyValue value in objectDict.Values)
+            {
+                value.objects.RemoveAll(s => s == null);
+                if (value.group.In("Stationary", "Enemy") && value.obj != barrel)
+                    test += value.objects.Count;
+            }
+            if (test == 0)
+            {
+                waveTimer = maxTimer;
+                ClearMap();
+                state = "Clearing";
+            }
+        }
 
         if (Input.GetMouseButtonDown(1) || waveTimer < 0)
         {
