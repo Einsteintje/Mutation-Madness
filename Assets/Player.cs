@@ -31,6 +31,9 @@ public class Player : MonoBehaviour
     Vignette vignette;
 
     [HideInInspector]
+    public string mutation;
+
+    [HideInInspector]
     public Dictionary<string, float> mutationEffects = new Dictionary<string, float>
     {
         { "Ice", 0.0f },
@@ -75,6 +78,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Invoke("SetMutation", 0.1f);
         weapon = GetComponentInChildren<weaponScript>();
         renderers = GetComponentsInChildren<SpriteRenderer>();
         volume.profile.TryGet(out vignette);
@@ -195,6 +199,17 @@ public class Player : MonoBehaviour
         }
     }
 
+    void SetMutation()
+    {
+        if (ShopManager.instance.randomMutation)
+        {
+            ShopManager.instance.randomMutation = false;
+            mutation = MutationManager.instance.mutations.Keys.ElementAt(
+                Random.Range(0, MutationManager.instance.mutations.Keys.Count)
+            );
+        }
+    }
+
     void Flash()
     {
         foreach (SpriteRenderer renderer in renderers)
@@ -240,10 +255,17 @@ public class Player : MonoBehaviour
             {
                 if (mutationPS[mutation].isPlaying)
                     mutationPS[mutation].Stop();
-                slipperyness = 1f;
-                fireSpeed = 1f;
-                fireTimer = 0f;
-                charged = 1.0f;
+                if (mutation == "Fire")
+                {
+                    fireSpeed = 1f;
+                    fireTimer = 0f;
+                }
+                else if (mutation == "Ice")
+                {
+                    slipperyness = 1f;
+                }
+                else
+                    charged = 1.0f;
             }
         }
     }

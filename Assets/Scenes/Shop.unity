@@ -1289,6 +1289,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currency: 150
+  randomMutation: 0
   currencyObj: {fileID: 371008102}
 --- !u!4 &802678227
 Transform:
@@ -1936,7 +1937,7 @@ GameObject:
   - component: {fileID: 1340310661}
   m_Layer: 5
   m_Name: Mutation
-  m_TagString: Untagged
+  m_TagString: Mutation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

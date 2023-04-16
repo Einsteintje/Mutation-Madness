@@ -68,5 +68,7 @@ public class weaponScript : MonoBehaviour
         script.moveSpeed = 100;
         script.size = 2f;
         script.color = Player.instance.color;
+        if (Player.instance.mutation != null)
+            script.mutation = Player.instance.mutation;
     }
 }

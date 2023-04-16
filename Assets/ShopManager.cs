@@ -15,7 +15,10 @@ public class ShopManager : MonoBehaviour
         shield,
         speed,
         reload,
-        play;
+        play,
+        mutation;
+
+    public bool randomMutation = false;
 
     public GameObject currencyObj;
     TMP_Text currencyText;
@@ -43,6 +46,7 @@ public class ShopManager : MonoBehaviour
         reload = GameObject.FindWithTag("Reload");
         speed = GameObject.FindWithTag("Speed");
         shield = GameObject.FindWithTag("Shield");
+        mutation = GameObject.FindWithTag("Mutation");
         currencyObj = GameObject.FindWithTag("Currency");
         currencyText = currencyObj.GetComponentInChildren<TMP_Text>();
         if (upgrades.Keys.Contains("Health"))
@@ -93,15 +97,33 @@ public class ShopManager : MonoBehaviour
                 reload.GetComponentInChildren<TMP_Text>(),
                 reload
             );
+        if (upgrades.Keys.Contains("Mutation"))
+        {
+            upgrades["Mutation"].obj = mutation;
+            upgrades["Mutation"].text = mutation.GetComponentInChildren<TMP_Text>();
+        }
+        else
+            upgrades["Mutation"] = new Upgrade(
+                0f,
+                2000,
+                mutation.GetComponentInChildren<TMP_Text>(),
+                mutation
+            );
 
         foreach (Upgrade upgrade in upgrades.Values)
         {
-            upgrade.text.text = $"{upgrade.obj.name} - {upgrade.cost.ToString()}";
+            if (upgrade.boost == 0f)
+            {
+                upgrade.text.text = $"{upgrade.obj.name} - {upgrade.cost.ToString()} - Disabled";
+            }
+            else
+                upgrade.text.text = $"{upgrade.obj.name} - {upgrade.cost.ToString()}";
         }
         health.GetComponent<Button>().onClick.AddListener(() => ButtonClick(health));
         speed.GetComponent<Button>().onClick.AddListener(() => ButtonClick(speed));
         reload.GetComponent<Button>().onClick.AddListener(() => ButtonClick(reload));
         shield.GetComponent<Button>().onClick.AddListener(() => ButtonClick(shield));
+        mutation.GetComponent<Button>().onClick.AddListener(() => ButtonClick(mutation));
         play.GetComponent<Button>().onClick.AddListener(() => PlayGame());
     }
 
@@ -115,12 +137,24 @@ public class ShopManager : MonoBehaviour
 
     public void ButtonClick(GameObject obj)
     {
-        if (currency > upgrades[obj.name].cost)
+        if (
+            currency > upgrades[obj.name].cost
+            && (obj.name != "Mutation" || randomMutation == false)
+        )
         {
             currency -= upgrades[obj.name].cost;
             upgrades[obj.name].cost *= 2;
-            upgrades[obj.name].boost += 0.1f;
-            upgrades[obj.name].text.text = $"{obj.name} - {upgrades[obj.name].cost.ToString()}";
+            if (obj.name == "Mutation")
+            {
+                randomMutation = true;
+                upgrades[obj.name].text.text =
+                    $"{obj.name} - {upgrades[obj.name].cost.ToString()} - Active";
+            }
+            else
+            {
+                upgrades[obj.name].boost += 0.1f;
+                upgrades[obj.name].text.text = $"{obj.name} - {upgrades[obj.name].cost.ToString()}";
+            }
         }
     }
 

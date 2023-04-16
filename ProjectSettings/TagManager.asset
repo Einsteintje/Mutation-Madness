@@ -19,6 +19,7 @@ TagManager:
   - Reload
   - Shield
   - Play
+  - Mutation
   layers:
   - Default
   - TransparentFX

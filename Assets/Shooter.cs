@@ -47,7 +47,7 @@ public class Shooter : Enemy
                     Bullet script = spawned.GetComponent<Bullet>();
                     script.moveSpeed = attackSpeed;
                     script.size = 2f;
-                    script.color = Color.red;
+                    script.color = color;
                     script.mutation = mutation;
                     cD = maxCD;
                 }
