@@ -18,10 +18,14 @@ public class uiScript : MonoBehaviour
     void Update()
     {
         if (Manager.instance.state == "Idle")
-            tmpList[0].text = Manager.instance.waveTimer.ToString("F1");
+        {
+            string time = Manager.instance.waveTimer.ToString("F1");
+            tmpList[0].text = $"Time : {time}";
+        }
         else
-            tmpList[0].text = "0,0";
+            tmpList[0].text = "Time : 0,0";
 
-        tmpList[1].text = Manager.instance.wave.ToString();
+        tmpList[1].text = $"Wave : {Manager.instance.wave.ToString()}";
+        tmpList[2].text = $"Score : {Player.instance.score}";
     }
 }

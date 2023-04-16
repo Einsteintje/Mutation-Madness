@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -50,14 +51,25 @@ public class Player : MonoBehaviour
     [HideInInspector]
     public float charged = 1f;
 
-    public float hP;
+    public int hP;
+    public int maxHP;
+    float healthTimer;
+    float maxHealthTimer;
+    public GameObject healthBar;
+
+    [HideInInspector]
+    public healthBarScript healthBarScript;
+
+    public int score;
 
     void Awake()
     {
         if (instance != null && instance != this)
             Destroy(this.gameObject);
         else
+        {
             instance = this;
+        }
     }
 
     // Start is called before the first frame update
@@ -67,11 +79,19 @@ public class Player : MonoBehaviour
         renderers = GetComponentsInChildren<SpriteRenderer>();
         volume.profile.TryGet(out vignette);
         color = renderers[0].color;
+        healthBar = Instantiate(healthBar);
+        healthBarScript = healthBar.GetComponent<healthBarScript>();
+
+        maxHP = (int)(maxHP * ShopManager.instance.upgrades["Health"].boost);
+
+        hP = maxHP;
+        healthBar.transform.position = transform.position + Vector3.up * 3;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        MutationHandler();
         vignette.center.value = new Vector2(
             (transform.position.x / 2 + Manager.instance.screenSize.x / 2)
                 / (Manager.instance.screenSize.x),
@@ -95,6 +115,7 @@ public class Player : MonoBehaviour
                 movement,
                 input
                     * moveSpeed
+                    * ShopManager.instance.upgrades["Speed"].boost
                     / Mathf.Pow(slipperyness, 1f / 10f)
                     * fireSpeed
                     * Time.fixedDeltaTime
@@ -107,9 +128,22 @@ public class Player : MonoBehaviour
             Vector3 clampedPos = Manager.instance.Clamp(transform.position);
             if (clampedPos.x != transform.position.x || clampedPos.y != transform.position.y)
                 transform.position = new Vector3(clampedPos.x, clampedPos.y, transform.position.z);
+            healthBar.transform.position = transform.position + Vector3.up * 3;
+            if (hP != healthBarScript.hP)
+            {
+                healthBarScript.FadeIn();
+                healthBarScript.UpdateSlider(hP, maxHP);
+                healthTimer = maxHealthTimer;
+            }
+            else if (healthTimer > 0)
+                healthTimer -= Time.fixedDeltaTime;
         }
         else
         {
+            healthBar.transform.position = transform.position + Vector3.up * 3;
+            foreach (string mutation in MutationManager.instance.mutations.Keys)
+                mutationEffects[mutation] = 0f;
+
             transform.position = new Vector3(
                 Mathf.Lerp(transform.position.x, 0, 0.04f),
                 Mathf.Lerp(transform.position.y, 0, 0.04f),
@@ -119,15 +153,24 @@ public class Player : MonoBehaviour
             weapon.enabled = false;
             weapon.recoil = new Vector3(0, 0, 0);
         }
-        MutationHandler();
     }
 
     public void Hit((Vector3, string) tuple)
     {
-        mutationEffects[tuple.Item2] = 1.0f;
-        knockback = tuple.Item1;
-        HitPS(tuple.Item1);
-        Flash();
+        hP--;
+        if (hP > 0)
+        {
+            mutationEffects[tuple.Item2] = 1.0f;
+            knockback = tuple.Item1;
+            HitPS(tuple.Item1);
+            Flash();
+        }
+        else
+        {
+            ShopManager.instance.canvas.SetActive(true);
+            ShopManager.instance.currency += score;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+        }
     }
 
     void Flash()

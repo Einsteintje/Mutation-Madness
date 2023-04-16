@@ -36,7 +36,7 @@ public class Shooter : Enemy
         {
             if (!hit.collider.gameObject.tag.In("Box", "Barrel") || alternate)
             {
-                cD -= Time.fixedDeltaTime;
+                cD -= Time.fixedDeltaTime * charged;
                 if (cD <= 0)
                 {
                     GameObject spawned = Instantiate(

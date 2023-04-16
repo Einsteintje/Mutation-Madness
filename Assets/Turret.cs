@@ -94,6 +94,7 @@ public class Turret : MonoBehaviour
 
     void Death()
     {
+        Player.instance.score += 200;
         ps.Play(); //gonna be a different one later
         GetComponent<BoxCollider2D>().enabled = false;
         GetComponent<SpriteRenderer>().enabled = false;

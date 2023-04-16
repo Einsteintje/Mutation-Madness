@@ -65,6 +65,14 @@ public abstract class Enemy : MonoBehaviour
     public string mutation;
 
     [HideInInspector]
+    public float fireTimer = 0f;
+
+    [HideInInspector]
+    public float charged = 1f;
+
+    Dictionary<string, ParticleSystem> mutationPS = new Dictionary<string, ParticleSystem>();
+
+    [HideInInspector]
     public Dictionary<string, float> mutationEffects = new Dictionary<string, float>
     {
         { "Ice", 0.0f },
@@ -248,6 +256,7 @@ public abstract class Enemy : MonoBehaviour
 
     public void Death()
     {
+        Player.instance.score += 100;
         ScreenShake.instance.Shake();
         CancelInvoke("AddHealth");
         CancelInvoke("ResetColor");
@@ -270,8 +279,15 @@ public abstract class Enemy : MonoBehaviour
 
     public float Angle()
     {
-        float y = Player.instance.transform.position.y - transform.position.y;
-        float x = Player.instance.transform.position.x - transform.position.x;
+        float y =
+            Player.instance.transform.position.y
+            - transform.position.y
+            + Mathf.Pow(charged, 10) * Random.Range(-1f, 1f);
+        ;
+        float x =
+            Player.instance.transform.position.x
+            - transform.position.x
+            + Mathf.Pow(charged, 10) * Random.Range(-1f, 1f);
         float yPrediction = Mathf.Abs(y) / attackSpeed * Player.instance.movement.y * prediction;
         float xPrediction = Mathf.Abs(x) / attackSpeed * Player.instance.movement.x * prediction;
         return Mathf.Atan2(y + yPrediction, x + xPrediction) * Mathf.Rad2Deg;
@@ -299,6 +315,38 @@ public abstract class Enemy : MonoBehaviour
         main.startColor = color;
         main = subEmitter.main;
         main.startColor = color;
+    }
+
+    void MutationHandler()
+    {
+        foreach (string mutation in MutationManager.instance.mutations.Keys)
+        {
+            if (mutationEffects[mutation] > 0)
+            {
+                if (!mutationPS.Keys.Contains(mutation))
+                    mutationPS[mutation] = Instantiate(
+                        MutationManager.instance.mutations[mutation].ps,
+                        transform
+                    );
+                if (!mutationPS[mutation].isPlaying)
+                    mutationPS[mutation].Play();
+                MutationManager.instance.mutations[mutation].action(this.gameObject);
+            }
+            else if (mutationPS.Keys.Contains(mutation))
+            {
+                if (mutationPS[mutation].isPlaying)
+                    mutationPS[mutation].Stop();
+                if (mutation == "Ice")
+                    navMeshAgent.acceleration = 50;
+                else if (mutation == "Fire")
+                {
+                    navMeshAgent.speed = 30;
+                    fireTimer = 0f;
+                }
+                else
+                    charged = 1.0f;
+            }
+        }
     }
 
     public abstract void DisableCollider();

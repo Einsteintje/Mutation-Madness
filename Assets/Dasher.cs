@@ -40,7 +40,7 @@ public class Dasher : Enemy
         }
         if (cD > 0)
         {
-            cD -= Time.fixedDeltaTime;
+            cD -= Time.fixedDeltaTime * charged;
         }
         if (Vector3.Distance(transform.position, target) < 3 && cD <= 0)
         {

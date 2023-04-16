@@ -46,6 +46,18 @@ public class MutationManager : MonoBehaviour
                 Player.instance.hP -= 1;
             }
         }
+        else
+        {
+            Enemy script = obj.GetComponent<Enemy>();
+            script.mutationEffects["Fire"] -= Time.fixedDeltaTime / 5;
+            script.fireTimer += Time.fixedDeltaTime;
+            if (script.fireTimer > 2)
+            {
+                script.fireTimer = 0;
+                script.hP -= 1;
+            }
+            obj.GetComponent<UnityEngine.AI.NavMeshAgent>().speed = 45;
+        }
     };
 
     Action<GameObject> Ice = (obj) =>
@@ -53,7 +65,12 @@ public class MutationManager : MonoBehaviour
         if (obj.tag == "Player")
         {
             Player.instance.mutationEffects["Ice"] -= Time.fixedDeltaTime / 5;
-            Player.instance.slipperyness = 0.03f;
+        }
+        else
+        {
+            Enemy script = obj.GetComponent<Enemy>();
+            script.mutationEffects["Ice"] -= Time.fixedDeltaTime / 5;
+            obj.GetComponent<UnityEngine.AI.NavMeshAgent>().acceleration = 5;
         }
     };
 
@@ -63,6 +80,11 @@ public class MutationManager : MonoBehaviour
         {
             Player.instance.mutationEffects["Electric"] -= Time.fixedDeltaTime / 5;
             Player.instance.charged = 1.5f;
+        }
+        else
+        {
+            Enemy script = obj.GetComponent<Enemy>();
+            script.charged = 1.5f;
         }
     };
 }

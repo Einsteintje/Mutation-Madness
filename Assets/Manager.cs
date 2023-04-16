@@ -191,7 +191,6 @@ public class Manager : MonoBehaviour
                 {
                     if (list[y][x] > noise)
                     {
-                        this.Log(pos);
                         GameObject spawned = Instantiate(box, pos, box.transform.rotation);
                         spawned.transform.parent = navMesh.transform;
                         objectDict[spawned.tag].objects.Add(spawned);

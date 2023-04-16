@@ -42,7 +42,14 @@ public class Thrower : Enemy
             GameObject spawn = Instantiate(shell);
             Shell script = spawn.GetComponent<Shell>();
             script.transform.position = transform.position;
-            script.destination = Player.instance.transform.position;
+            script.destination =
+                Player.instance.transform.position
+                + new Vector3(
+                    Mathf.Pow(charged, 10) * Random.Range(-1f, 1f),
+                    Mathf.Pow(charged, 10) * Random.Range(-1f, 1f),
+                    0
+                );
+            ;
             script.color = color;
             script.mutation = mutation;
         }
