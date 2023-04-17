@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.AI;
 
 public abstract class Enemy : MonoBehaviour
 {
@@ -169,11 +170,23 @@ public abstract class Enemy : MonoBehaviour
                 Mathf.Lerp(knockback.y, 0, knockbackLerpSpeed),
                 0
             );
+            MutationHandler();
+            if (hP <= 0)
+                Death();
         }
     }
 
     public void SharedStart()
     {
+        NavMeshHit hit;
+        while (!NavMesh.SamplePosition(transform.position, out hit, 1.0f, NavMesh.AllAreas))
+        {
+            transform.position = new Vector3(
+                Random.Range(-Manager.instance.screenSize.x, Manager.instance.screenSize.x),
+                Random.Range(-Manager.instance.screenSize.y, Manager.instance.screenSize.y),
+                0
+            );
+        }
         body = Instantiate(body);
         healthBar = Instantiate(healthBar);
         healthBarScript = healthBar.GetComponent<healthBarScript>();

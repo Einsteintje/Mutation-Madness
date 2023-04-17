@@ -158,8 +158,8 @@ public class Player : MonoBehaviour
         else
         {
             healthBar.transform.position = transform.position + Vector3.up * 3;
-            foreach (string mutation in MutationManager.instance.mutations.Keys)
-                mutationEffects[mutation] = 0f;
+            foreach (string mutationKey in MutationManager.instance.mutations.Keys)
+                mutationEffects[mutationKey] = 0f;
 
             transform.position = new Vector3(
                 Mathf.Lerp(transform.position.x, 0, 0.04f),
@@ -187,13 +187,7 @@ public class Player : MonoBehaviour
             if (ShopManager.instance != null)
             {
                 ShopManager.instance.Invoke("Start", 0.1f);
-                //foreach (GameObject barrel in ShopManager.instance.barrels)
-                //barrel.SetActive(true);
-                //ShopManager.instance.canvas.SetActive(true);
-                //ShopManager.instance.volume.SetActive(true);
                 ShopManager.instance.currency += score;
-                //ShopManager.instance.currencyText.text =
-                //$"Currency = {ShopManager.instance.currency.ToString()}";
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
             }
         }
@@ -201,13 +195,14 @@ public class Player : MonoBehaviour
 
     void SetMutation()
     {
-        if (ShopManager.instance.randomMutation)
-        {
-            ShopManager.instance.randomMutation = false;
-            mutation = MutationManager.instance.mutations.Keys.ElementAt(
-                Random.Range(0, MutationManager.instance.mutations.Keys.Count)
-            );
-        }
+        if (ShopManager.instance != null)
+            if (ShopManager.instance.randomMutation)
+            {
+                ShopManager.instance.randomMutation = false;
+                mutation = MutationManager.instance.mutations.Keys.ElementAt(
+                    Random.Range(0, MutationManager.instance.mutations.Keys.Count)
+                );
+            }
     }
 
     void Flash()
@@ -238,29 +233,29 @@ public class Player : MonoBehaviour
 
     void MutationHandler()
     {
-        foreach (string mutation in MutationManager.instance.mutations.Keys)
+        foreach (string mutationKey in MutationManager.instance.mutations.Keys)
         {
-            if (mutationEffects[mutation] > 0)
+            if (mutationEffects[mutationKey] > 0)
             {
-                if (!mutationPS.Keys.Contains(mutation))
-                    mutationPS[mutation] = Instantiate(
-                        MutationManager.instance.mutations[mutation].ps,
+                if (!mutationPS.Keys.Contains(mutationKey))
+                    mutationPS[mutationKey] = Instantiate(
+                        MutationManager.instance.mutations[mutationKey].ps,
                         transform
                     );
-                if (!mutationPS[mutation].isPlaying)
-                    mutationPS[mutation].Play();
-                MutationManager.instance.mutations[mutation].action(this.gameObject);
+                if (!mutationPS[mutationKey].isPlaying)
+                    mutationPS[mutationKey].Play();
+                MutationManager.instance.mutations[mutationKey].action(this.gameObject);
             }
-            else if (mutationPS.Keys.Contains(mutation))
+            else if (mutationPS.Keys.Contains(mutationKey))
             {
-                if (mutationPS[mutation].isPlaying)
-                    mutationPS[mutation].Stop();
-                if (mutation == "Fire")
+                if (mutationPS[mutationKey].isPlaying)
+                    mutationPS[mutationKey].Stop();
+                if (mutationKey == "Fire")
                 {
                     fireSpeed = 1f;
                     fireTimer = 0f;
                 }
-                else if (mutation == "Ice")
+                else if (mutationKey == "Ice")
                 {
                     slipperyness = 1f;
                 }

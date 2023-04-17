@@ -26,7 +26,6 @@ public class MenuBarrels : MonoBehaviour
     void PSList2()
     {
         psList2 = GetComponentsInChildren<ParticleSystem>();
-        this.Log(psList2.Length);
     }
 
     // Update is called once per frame

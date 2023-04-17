@@ -138,7 +138,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   psList: []
-  explosionRange: 0
+  explosionRange: 7
   gameObjects:
   - {fileID: 4493552140564910995, guid: 5a4b681282d38844e93dfb3e07e30a7a, type: 3}
   - {fileID: 3567186833555244942, guid: eb4620e0fa6e1564898c2a3d4bb82c11, type: 3}
